@@ -277,9 +277,9 @@ def init(args_: Args, logger_):
 
     if args.do_eval:
         assert os.path.exists(args.output_dir)
-        assert os.path.exists(args.data_dir_for_val)
-    else:
-        assert os.path.exists(args.data_dir)
+    #    assert os.path.exists(args.data_dir_for_val)
+    #else:
+        #assert os.path.exists(args.data_dir)
 
     if args.log_dir is None:
         args.log_dir = args.output_dir
