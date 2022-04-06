@@ -1,7 +1,7 @@
 python src/run.py --argoverse --future_frame_num 30 \
   --do_train --data_dir train/data/ --output_dir EV2_0_add_lane_gcn \
   --hidden_size 128 --train_batch_size 64 --sub_graph_batch_size 4096 --use_map \
-  --core_num 16 --use_centerline --distributed_training 4 --reuse_temp_file --temp_file_dir /research/pheng4/qdliu/jzwang/codes/DenseTNT/output \
+  --core_num 16 --use_centerline --distributed_training 4 --reuse_temp_file --temp_file_dir /research/dept7/zxzhao/jzwang/DenseTNT/output \
   --other_params \
     semantic_lane direction l1_loss \
     goals_2D enhance_global_graph subdivide lazy_points new laneGCN point_sub_graph \
