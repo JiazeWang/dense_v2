@@ -71,6 +71,7 @@ class VectorNet(nn.Module):
         hidden_size = args.hidden_size
 
         self.point_level_sub_graph = NewSubGraph(hidden_size)
+        self.point_level_sub_graph_lane = NewSubGraph(hidden_size)
         self.point_level_cross_attention = CrossAttention(hidden_size)
 
         self.global_graph = GlobalGraph(hidden_size)
@@ -121,7 +122,7 @@ class VectorNet(nn.Module):
         if 'stage_one' in args.other_params:
             lane_states_batch = []
             for i in range(batch_size):
-                a, b = self.point_level_sub_graph(map_input_list_list[i])
+                a, b = self.point_level_sub_graph_lane(map_input_list_list[i])
                 lane_states_batch.append(a)
 
         if 'laneGCN' in args.other_params:
