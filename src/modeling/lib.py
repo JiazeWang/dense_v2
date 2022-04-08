@@ -171,7 +171,7 @@ class GlobalGraphRes(nn.Module):
 
 class GlobalGraphRes_h(nn.Module):
     def __init__(self, hidden_size):
-        super(GlobalGraphRes, self).__init__()
+        super(GlobalGraphRes_h, self).__init__()
         self.global_graph = GlobalGraph(hidden_size, hidden_size)
         self.global_graph2 = GlobalGraph(hidden_size, hidden_size)
 
