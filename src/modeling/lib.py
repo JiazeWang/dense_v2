@@ -172,8 +172,8 @@ class GlobalGraphRes(nn.Module):
 class GlobalGraphRes_h(nn.Module):
     def __init__(self, hidden_size):
         super(GlobalGraphRes_h, self).__init__()
-        self.global_graph = GlobalGraph(hidden_size, hidden_size // 2, num_attention_heads=2)
-        self.global_graph2 = GlobalGraph(hidden_size, hidden_size // 2, num_attention_heads=2)
+        self.global_graph = GlobalGraph(hidden_size, hidden_size // 2, num_attention_heads=1)
+        self.global_graph2 = GlobalGraph(hidden_size, hidden_size // 2, num_attention_heads=1)
 
     def forward(self, hidden_states, attention_mask=None, mapping=None):
         # hidden_states = self.global_graph(hidden_states, attention_mask, mapping) \
