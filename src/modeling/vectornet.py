@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch import nn, Tensor
 
 from modeling.decoder import Decoder, DecoderResCat
-from modeling.lib import MLP, GlobalGraph, LayerNorm, CrossAttention, GlobalGraphRes
+from modeling.lib import MLP, GlobalGraph, LayerNorm, CrossAttention, GlobalGraphRes_h
 import utils
 
 
@@ -76,10 +76,10 @@ class VectorNet(nn.Module):
 
         self.global_graph = GlobalGraph(hidden_size)
         if 'enhance_global_graph' in args.other_params:
-            self.global_graph = GlobalGraphRes(hidden_size)
+            self.global_graph = GlobalGraphRes_h(hidden_size)
         if 'laneGCN' in args.other_params:
             self.laneGCN_A2L = CrossAttention(hidden_size)
-            self.laneGCN_L2L = GlobalGraphRes(hidden_size)
+            self.laneGCN_L2L = GlobalGraphRes_h(hidden_size)
             self.laneGCN_L2A = CrossAttention(hidden_size)
 
         self.decoder = Decoder(args, self)

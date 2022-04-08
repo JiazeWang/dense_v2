@@ -169,6 +169,18 @@ class GlobalGraphRes(nn.Module):
                                    self.global_graph2(hidden_states, attention_mask, mapping)], dim=-1)
         return hidden_states
 
+class GlobalGraphRes_h(nn.Module):
+    def __init__(self, hidden_size):
+        super(GlobalGraphRes, self).__init__()
+        self.global_graph = GlobalGraph(hidden_size, hidden_size)
+        self.global_graph2 = GlobalGraph(hidden_size, hidden_size)
+
+    def forward(self, hidden_states, attention_mask=None, mapping=None):
+        # hidden_states = self.global_graph(hidden_states, attention_mask, mapping) \
+        #                 + self.global_graph2(hidden_states, attention_mask, mapping)
+        hidden_states = torch.cat([self.global_graph(hidden_states, attention_mask, mapping),
+                                   self.global_graph2(hidden_states, attention_mask, mapping)], dim=-1)
+        return hidden_states
 
 class PointSubGraph(nn.Module):
     """
