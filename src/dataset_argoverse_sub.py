@@ -332,7 +332,7 @@ def preprocess(args, id2info, mapping):
 
         """
         mapping['stage_one_label'] = 0
-
+    labels = [0.0 for _ in range(60)]
     mapping.update(dict(
         matrix=matrix,
         labels=np.array(labels).reshape([30, 2]),
