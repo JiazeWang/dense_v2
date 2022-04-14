@@ -46,7 +46,7 @@ for data in afl:
     predict_traj = get_multiple_forecasts(data)
     seq_id = int(data.current_seq.name[:-4])
     print("seq_id:", seq_id)
-    print("predict_traj[:,20:,:].shape", predict_traj[:,20:,:].shape)
+    print("predict_traj[:,20:,:].shape", predict_traj[:,20:,:].shape) #(6, 30, 2)
     output_all[seq_id] = predict_traj[:,20:,:]
     counter += 1
 
