@@ -45,6 +45,8 @@ for data in afl:
     print('\r'+str(counter)+'/'+str(len(afl)),end="")
     predict_traj = get_multiple_forecasts(data)
     seq_id = int(data.current_seq.name[:-4])
+    print("seq_id:", seq_id)
+    print("predict_traj[:,20:,:].shape", predict_traj[:,20:,:].shape)
     output_all[seq_id] = predict_traj[:,20:,:]
     counter += 1
 
