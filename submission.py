@@ -53,4 +53,5 @@ for data in afl:
 from argoverse.evaluation.competition_util import generate_forecasting_h5
 
 output_path = 'competition_files/'
+print("output_all:", output_all)
 generate_forecasting_h5(output_all, output_path) #this might take awhile
