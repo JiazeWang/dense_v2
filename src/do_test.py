@@ -102,6 +102,7 @@ def do_eval(args):
     from argoverse.evaluation.competition_util import generate_forecasting_h5
     output_path = 'competition_files/'
     generate_forecasting_h5(output_all, output_path) #this might take awhile
+    print("generating h5 files finished!!!")
 
     """
     if args.argoverse:
