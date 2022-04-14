@@ -92,7 +92,7 @@ def do_eval(args):
             assert pred_score[i].shape == (6,)
             argo_pred[mapping[i]['file_name']] = structs.MultiScoredTrajectory(pred_score[i].copy(), pred_trajectory[i].copy())
             print(mapping[i]['file_name'].split('/')[-1][:-4], " result: ", argo_pred[mapping[i]['file_name']][1].shape)
-            output_all[mapping[i]['file_name'].split('/')[-1][:-4]] = argo_pred[mapping[i]['file_name']][1]
+            output_all[int(mapping[i]['file_name'].split('/')[-1][:-4])] = argo_pred[mapping[i]['file_name']][1]
         if args.argoverse:
             eval_instance_argoverse(batch_size, args, pred_trajectory, mapping, file2pred, file2labels, DEs, iter_bar)
     if 'optimization' in args.other_params:
