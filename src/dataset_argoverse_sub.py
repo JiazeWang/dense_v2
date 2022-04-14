@@ -317,8 +317,8 @@ def preprocess(args, id2info, mapping):
 
     if 'goals_2D' in args.other_params:
         point_label = np.array(labels[-2:])
-        mapping['goals_2D_labels'] = np.argmin(get_dis(mapping['goals_2D'], point_label))
-
+        #mapping['goals_2D_labels'] = np.argmin(get_dis(mapping['goals_2D'], point_label))
+        mapping['goals_2D_labels'] = 0
         if 'stage_one' in args.other_params:
             stage_one_label = 0
             polygons = mapping['polygons']
