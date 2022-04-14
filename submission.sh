@@ -3,7 +3,7 @@ GPU_NUM=1; \
 CUDA_VISIBLE_DEVICES=0 python src/do_test.py --argoverse --future_frame_num 30 \
   --do_train --data_dir train/data/ --output_dir ${OUTPUT_DIR} \
   --hidden_size 128 --train_batch_size 64 --sub_graph_batch_size 4096 --use_map \
-  --core_num 16 --use_centerline --distributed_training ${GPU_NUM} --reuse_temp_file --temp_file_dir ../submission/test \
+  --core_num 16 --use_centerline --distributed_training ${GPU_NUM} --reuse_temp_file --temp_file_dir submission/test \
   --other_params \
     semantic_lane direction l1_loss \
     goals_2D enhance_global_graph subdivide lazy_points new laneGCN point_sub_graph \
