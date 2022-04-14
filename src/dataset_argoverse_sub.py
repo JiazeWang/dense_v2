@@ -319,6 +319,7 @@ def preprocess(args, id2info, mapping):
         point_label = np.array(labels[-2:])
         #mapping['goals_2D_labels'] = np.argmin(get_dis(mapping['goals_2D'], point_label))
         mapping['goals_2D_labels'] = 0
+        """
         if 'stage_one' in args.other_params:
             stage_one_label = 0
             polygons = mapping['polygons']
@@ -329,7 +330,8 @@ def preprocess(args, id2info, mapping):
                     min_dis = temp
                     stage_one_label = i
 
-            mapping['stage_one_label'] = stage_one_label
+        """
+        mapping['stage_one_label'] = 0
 
     mapping.update(dict(
         matrix=matrix,
