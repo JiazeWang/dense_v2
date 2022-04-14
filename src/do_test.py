@@ -96,11 +96,12 @@ def do_eval(args):
             eval_instance_argoverse(batch_size, args, pred_trajectory, mapping, file2pred, file2labels, DEs, iter_bar)
     if 'optimization' in args.other_params:
         utils.select_goals_by_optimization(None, None, close=True)
-
+    print("evaluation finished!!!")
+    """
     if args.argoverse:
         from dataset_argoverse import post_eval
         post_eval(args, file2pred, file2labels, DEs)
-
+    """
 
 def main():
     parser = argparse.ArgumentParser()
