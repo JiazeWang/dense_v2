@@ -163,6 +163,7 @@ class Decoder(nn.Module):
             print("label[final_idx]", label[final_idx])
             mapping[i]['goals_2D_labels'] = np.argmin(utils.get_dis(goals_2D, label[final_idx]))
             print("mapping[i]['goals_2D_labels']:", mapping[i]['goals_2D_labels'])
+            print(TestEnd)
         return scores, point, goals_2D
 
     def goals_2D_per_example_calc_loss(self, i: int, goals_2D: np.ndarray, mapping: List[Dict], inputs: Tensor,
