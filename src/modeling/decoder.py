@@ -101,11 +101,14 @@ class Decoder(nn.Module):
                 [DecoderResCat(hidden_size, hidden_size * 2, out_features=13) for _ in range(args.other_params['set_predict'])])
         ## refinement:
         pos_dim = 128
+        hidden_size = 128
         self.pos_emb = nn.Sequential(
             nn.Linear(60, pos_dim, bias=True),
             nn.LayerNorm(pos_dim),
             nn.ReLU(),
             nn.Linear(pos_dim, pos_dim, bias=True))
+
+        self.PoseRefiner = PoseRefiner(hidden_size, hidden_size * 4, out_features=2)
 
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
                                        hidden_states, device, loss):
@@ -211,7 +214,8 @@ class Decoder(nn.Module):
 
         # Refinement Module
         predict_traj_feature = self.pos_emb(predict_traj.reshape(60))
-        print("predict_traj_feature.shape:", predict_traj_feature.shape)
+        refine_target = self.PoseRefiner(torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention, predict_traj_feature], dim=-1))
+        print("refine_target.shape:", refine_target.shape)
         print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
         print(TestEnd)
         loss[i] += F.nll_loss(scores.unsqueeze(0),
