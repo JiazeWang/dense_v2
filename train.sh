@@ -1,5 +1,5 @@
 python src/run.py --argoverse --future_frame_num 30 \
-  --do_train --data_dir train/data/ --output_dir EV2_1_add_global_graph_attention2 \
+  --do_train --data_dir train/data/ --output_dir EV2_2_refine \
   --hidden_size 128 --train_batch_size 64 --sub_graph_batch_size 4096 --use_map \
   --core_num 16 --use_centerline --distributed_training 4 --reuse_temp_file --temp_file_dir /research/dept8/jzwang/year1/DenseTNT/output \
   --other_params \
