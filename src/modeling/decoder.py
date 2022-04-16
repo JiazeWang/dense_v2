@@ -159,11 +159,11 @@ class Decoder(nn.Module):
         if not args.do_test:
             label = np.array(labels[i]).reshape([self.future_frame_num, 2])
             final_idx = mapping[i].get('final_idx', -1)
-            print("goals_2D:", goals_2D.shape)
-            print("label[final_idx]", label[final_idx].shape)
+            #print("goals_2D:", goals_2D.shape) #(1541, 2)
+            #print("label[final_idx]", label[final_idx].shape)
             mapping[i]['goals_2D_labels'] = np.argmin(utils.get_dis(goals_2D, label[final_idx]))
-            print("mapping[i]['goals_2D_labels']:", mapping[i]['goals_2D_labels'])
-            print(TestEnd)
+            #print("mapping[i]['goals_2D_labels']:", mapping[i]['goals_2D_labels'])
+            #print(TestEnd)
         return scores, point, goals_2D
 
     def goals_2D_per_example_calc_loss(self, i: int, goals_2D: np.ndarray, mapping: List[Dict], inputs: Tensor,
@@ -189,7 +189,7 @@ class Decoder(nn.Module):
                     [self.future_frame_num, 2])
             loss[i] += (F.smooth_l1_loss(predict_traj, torch.tensor(gt_points, dtype=torch.float, device=device), reduction='none') * \
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
-
+        print("scores.shape", scores.shape, )
         loss[i] += F.nll_loss(scores.unsqueeze(0),
                               torch.tensor([mapping[i]['goals_2D_labels']], device=device))
 
