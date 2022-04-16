@@ -11,6 +11,17 @@ from modeling.lib import PointSubGraph, GlobalGraphRes, CrossAttention, GlobalGr
 
 import utils
 
+class PoseRefiner(nn.Module):
+    def __init__(self, hidden_size, out_features=2):
+        super(PoseRefiner, self).__init__()
+        self.mlp = MLP(hidden_size, hidden_size)
+        self.fc = nn.Linear(hidden_size, out_features)
+
+    def forward(self, hidden_states):
+        hidden_states = hidden_states + self.mlp(hidden_states)
+        hidden_states = self.fc(hidden_states)
+        return hidden_states
+
 
 class DecoderRes(nn.Module):
     def __init__(self, hidden_size, out_features=60):
@@ -187,6 +198,7 @@ class Decoder(nn.Module):
                 predict_traj = self.complete_traj_decoder(
                     torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention], dim=-1)).view(
                     [self.future_frame_num, 2])
+                print(hidden_states[i, 0, :].detach().shape, target_feature.shape, hidden_attention.shape)
                 print("predict_traj.shape:", predict_traj.shape)
             loss[i] += (F.smooth_l1_loss(predict_traj, torch.tensor(gt_points, dtype=torch.float, device=device), reduction='none') * \
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
