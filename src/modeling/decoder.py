@@ -210,7 +210,7 @@ class Decoder(nn.Module):
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
 
         # Refinement Module
-        predict_traj_feature = self.pos_emb(predict_traj.reshape(-1, 60))
+        predict_traj_feature = self.pos_emb(predict_traj.reshape(60))
         print("predict_traj_feature.shape:", predict_traj_feature.shape)
         print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
         print(TestEnd)
