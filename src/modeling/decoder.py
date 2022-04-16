@@ -236,7 +236,7 @@ class Decoder(nn.Module):
         # Refinement Module
         input_feature = torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention], dim=-1)
         predict_traj = self.Refiner(input_feature, predict_traj)
-        print("predict_traj:", predict_tarj.shape)
+        print("predict_traj:", predict_traj.shape)
         print("refine_target.shape:", refine_target.shape)
         print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
         print(TestEnd)
