@@ -17,10 +17,42 @@ class PoseRefiner(nn.Module):
         self.mlp = MLP(in_features, hidden_size)
         self.fc = nn.Linear(hidden_size + in_features, out_features)
 
+
     def forward(self, hidden_states):
         hidden_states = torch.cat([hidden_states, self.mlp(hidden_states)], dim=-1)
         hidden_states = self.fc(hidden_states)
         return hidden_states
+
+class Refiner(nn.Module):
+    def __init__(self, hidden_size):
+        super(Refiner, self).__init__()
+
+        self.pos_emb = nn.Sequential(
+            MLP(60, hidden_size),
+            MLP(hidden_size),
+            MLP(hidden_size)
+        )
+
+        self.goals_2D_mlps = nn.Sequential(
+            MLP(2, hidden_size),
+            MLP(hidden_size),
+            MLP(hidden_size)
+        )
+        self.PoseRefiner = PoseRefiner(hidden_size, hidden_size * 4, out_features=2)
+        self.complete_traj_decoder_new = DecoderResCat(hidden_size, hidden_size * 4, 60)
+
+    def forward(self, hidden_states, predict_traj, target_feature, hidden_attention, final_idx):
+        predict_traj_feature = self.pos_emb(predict_traj.reshape(60))
+        target_refine = self.PoseRefiner(torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention, predict_traj_feature], dim=-1))
+        target_refine = gt_points[final_idx] + target_refine
+        target_refine_feature = self.goals_2D_mlps(torch.tensor(target_refine, dtype=torch.float, device=device))
+        predict_traj_refine = self.complete_traj_decoder_new(torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention, predict_traj_feature, target_refine_feature], dim=-1)).view([self.future_frame_num, 2])
+        predict_traj_refine = predict_traj_refine + predict_traj
+
+        return target_refine, predict_traj_refine
+
+
+
 
 class DecoderRes(nn.Module):
     def __init__(self, hidden_size, out_features=60):
@@ -102,13 +134,9 @@ class Decoder(nn.Module):
         ## refinement:
         pos_dim = 128
         hidden_size = 128
-        self.pos_emb = nn.Sequential(
-            nn.Linear(60, pos_dim, bias=True),
-            nn.LayerNorm(pos_dim),
-            nn.ReLU(),
-            nn.Linear(pos_dim, pos_dim, bias=True))
 
-        self.PoseRefiner = PoseRefiner(hidden_size, hidden_size * 4, out_features=2)
+        self.Refiner = Refiner(hidden_size)
+
 
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
                                        hidden_states, device, loss):
@@ -213,8 +241,8 @@ class Decoder(nn.Module):
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
 
         # Refinement Module
-        predict_traj_feature = self.pos_emb(predict_traj.reshape(60))
-        refine_target = self.PoseRefiner(torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention, predict_traj_feature], dim=-1))
+        gt_goal, predict_traj = self.Refiner(hidden_states, predict_traj, target_feature, hidden_attention, final_idx)
+        print("gt_goal.shape:", gt_goal.shape, "predict_traj:", predict_tarj.shape)
         print("refine_target.shape:", refine_target.shape)
         print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
         print(TestEnd)
