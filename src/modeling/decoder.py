@@ -12,16 +12,15 @@ from modeling.lib import PointSubGraph, GlobalGraphRes, CrossAttention, GlobalGr
 import utils
 
 class PoseRefiner(nn.Module):
-    def __init__(self, hidden_size, out_features=2):
+    def __init__(self, hidden_size, in_features, out_features=2):
         super(PoseRefiner, self).__init__()
-        self.mlp = MLP(hidden_size, hidden_size)
-        self.fc = nn.Linear(hidden_size, out_features)
+        self.mlp = MLP(in_features, hidden_size)
+        self.fc = nn.Linear(hidden_size + in_features, out_features)
 
     def forward(self, hidden_states):
-        hidden_states = hidden_states + self.mlp(hidden_states)
+        hidden_states = torch.cat([hidden_states, self.mlp(hidden_states)], dim=-1)
         hidden_states = self.fc(hidden_states)
         return hidden_states
-
 
 class DecoderRes(nn.Module):
     def __init__(self, hidden_size, out_features=60):
@@ -100,6 +99,13 @@ class Decoder(nn.Module):
 
             self.set_predict_decoders = nn.ModuleList(
                 [DecoderResCat(hidden_size, hidden_size * 2, out_features=13) for _ in range(args.other_params['set_predict'])])
+        ## refinement:
+        pos_dim = 128
+        self.pos_emb = nn.Sequential(
+            nn.Linear(60, pos_dim, bias=True),
+            nn.LayerNorm(pos_dim),
+            nn.ReLU(),
+            nn.Linear(pos_dim, pos_dim, bias=True))
 
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
                                        hidden_states, device, loss):
@@ -202,6 +208,10 @@ class Decoder(nn.Module):
                 print("predict_traj.shape:", predict_traj.shape)
             loss[i] += (F.smooth_l1_loss(predict_traj, torch.tensor(gt_points, dtype=torch.float, device=device), reduction='none') * \
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
+
+        # Refinement Module
+        predict_traj_feature = self.pos_emb(predict_traj.reshape(-1, 60))
+        print("predict_traj_feature.shape:", predict_traj_feature.shape)
         print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
         print(TestEnd)
         loss[i] += F.nll_loss(scores.unsqueeze(0),
