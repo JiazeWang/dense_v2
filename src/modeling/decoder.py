@@ -234,7 +234,7 @@ class Decoder(nn.Module):
 
         # Refinement Module
         predict_traj = self.Refiner(hidden_states, predict_traj, target_feature, hidden_attention, final_idx)
-        print(predict_traj:", predict_tarj.shape)
+        print("predict_traj:", predict_tarj.shape)
         print("refine_target.shape:", refine_target.shape)
         print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
         print(TestEnd)
