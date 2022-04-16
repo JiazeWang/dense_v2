@@ -33,12 +33,13 @@ class Refiner(nn.Module):
             MLP(hidden_size)
         )
         self.PoseRefiner = PoseRefiner(hidden_size, hidden_size * 4, out_features=2)
+        self.future_frame_num = 30
         self.complete_traj_decoder_new = DecoderResCat(hidden_size, hidden_size * 4, 60)
 
-    def forward(self, hidden_states, predict_traj, target_feature, hidden_attention, final_idx):
+    def forward(self, input_feature, predict_traj):
         predict_traj_feature = self.pos_emb(predict_traj.reshape(60))
-        traj_refine = self.PoseRefiner(torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention, predict_traj_feature], dim=-1))
-        predict_traj_refine = self.complete_traj_decoder_new(torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention, predict_traj_feature], dim=-1)).view([self.future_frame_num, 2])
+        traj_refine = self.PoseRefiner(torch.cat([input_feature, predict_traj_feature], dim=-1))
+        predict_traj_refine = self.complete_traj_decoder_new(torch.cat([input_feature, predict_traj_feature], dim=-1)).view([self.future_frame_num, 2])
         predict_traj_refine = predict_traj_refine + predict_traj
 
         return predict_traj_refine
@@ -233,7 +234,8 @@ class Decoder(nn.Module):
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
 
         # Refinement Module
-        predict_traj = self.Refiner(hidden_states, predict_traj, target_feature, hidden_attention, final_idx)
+        input_feature = torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention], dim=-1)
+        predict_traj = self.Refiner(input_feature, predict_traj)
         print("predict_traj:", predict_tarj.shape)
         print("refine_target.shape:", refine_target.shape)
         print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
