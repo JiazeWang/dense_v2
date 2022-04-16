@@ -189,7 +189,7 @@ class Decoder(nn.Module):
                     [self.future_frame_num, 2])
             loss[i] += (F.smooth_l1_loss(predict_traj, torch.tensor(gt_points, dtype=torch.float, device=device), reduction='none') * \
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
-        print("scores.shape", scores, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
+        print("scores.shape", scores.shape, "torch.tensor([mapping[i]['goals_2D_labels']]:", torch.tensor([mapping[i]['goals_2D_labels']]))
         print(TestEnd)
         loss[i] += F.nll_loss(scores.unsqueeze(0),
                               torch.tensor([mapping[i]['goals_2D_labels']], device=device))
