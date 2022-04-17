@@ -37,9 +37,9 @@ class Refiner(nn.Module):
         self.complete_traj_decoder_new = DecoderResCat(hidden_size, hidden_size * 4, 60)
 
     def forward(self, input_feature, predict_traj):
-        predict_traj_feature = self.pos_emb(predict_traj.reshape(60))
+        predict_traj_feature = self.pos_emb(predict_traj.reshape(-1, 60))
         traj_refine = self.PoseRefiner(torch.cat([input_feature, predict_traj_feature], dim=-1))
-        predict_traj_refine = self.complete_traj_decoder_new(torch.cat([input_feature, predict_traj_feature], dim=-1)).view([self.future_frame_num, 2])
+        predict_traj_refine = self.complete_traj_decoder_new(torch.cat([input_feature, predict_traj_feature], dim=-1)).view([-1, self.future_frame_num, 2])
         predict_traj_refine = predict_traj_refine + predict_traj
 
         return predict_traj_refine
