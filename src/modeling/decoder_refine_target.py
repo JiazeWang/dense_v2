@@ -33,7 +33,7 @@ class TRefiner(nn.Module):
             MLP(hidden_size),
             MLP(hidden_size)
         )
-        self.TargetRefiner = TargetRefiner(hidden_size, hidden_size * 4, out_features=2)
+        #self.TargetRefiner = TargetRefiner(hidden_size, hidden_size * 4, out_features=2)
         self.future_frame_num = 30
         self.complete_target_decoder_new = DecoderResCat(hidden_size, hidden_size * 4, 2)
 
@@ -223,7 +223,7 @@ class Decoder(nn.Module):
 
             input_feature = torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention], dim=-1)
             predict_target = self.TRefiner(input_feature, torch.tensor(highest_goal, dtype=torch.float, device=device))
-            print(predict_target.shape, torch.tensor(gt_points[final_idx], dtype=torch.float, device=device).shape)
+            #print(predict_target.shape, torch.tensor(gt_points[final_idx], dtype=torch.float, device=device).shape)
             loss[i] += (F.smooth_l1_loss(torch.tensor(highest_goal, dtype=torch.float, device=device), torch.tensor(gt_points[final_idx], dtype=torch.float, device=device)))
 
 
