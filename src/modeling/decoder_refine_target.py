@@ -40,6 +40,7 @@ class TRefiner(nn.Module):
     def forward(self, input_feature, predict_target):
         predict_target_feature = self.pos_emb(predict_target.reshape(2))
         target_refine = self.TargetRefiner(torch.cat([input_feature, predict_target_feature], dim=-1))
+        print("input_feature:",input_feature.shape, target_refine.shape)
         predict_target_refine = self.complete_target_decoder_new(torch.cat([input_feature, target_refine], dim=-1)).view([2])
         predict_target_refine = predict_target_refine + predict_target
 
