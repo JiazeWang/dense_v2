@@ -225,7 +225,8 @@ class Decoder(nn.Module):
             predict_target = self.TRefiner(input_feature, torch.tensor(highest_goal, dtype=torch.float, device=device))
             #print(predict_target.shape, torch.tensor(gt_points[final_idx], dtype=torch.float, device=device).shape)
             loss[i] += (F.smooth_l1_loss(torch.tensor(predict_target, dtype=torch.float, device=device), torch.tensor(gt_points[final_idx], dtype=torch.float, device=device)))
-            DE[i][final_idx] = np.sqrt((predict_target[0] - gt_points[final_idx][0]) ** 2 + (predict_target[1] - gt_points[final_idx][1]) ** 2)
+            predict_target_numpy = predict_target.cpu().detach().numpy()
+            DE[i][final_idx] = np.sqrt((predict_target_numpy[0] - gt_points[final_idx][0]) ** 2 + (predict_target_numpy[1] - gt_points[final_idx][1]) ** 2)
 
         loss[i] += F.nll_loss(scores.unsqueeze(0),
                               torch.tensor([mapping[i]['goals_2D_labels']], device=device))
