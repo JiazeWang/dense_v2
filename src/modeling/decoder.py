@@ -333,6 +333,9 @@ class Decoder(nn.Module):
                 predict_trajs = self.complete_traj_decoder(
                     torch.cat([hidden_states[i, 0, :].unsqueeze(0).expand(len(targets_feature), -1), targets_feature,
                                hidden_attention], dim=-1)).view([self.mode_num, self.future_frame_num, 2])
+                input_feature = torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention], dim=-1)
+                predict_trajs = self.Refiner(input_feature, predict_trajs)
+
                 predict_trajs = np.array(predict_trajs.tolist())
                 final_idx = mapping[i].get('final_idx', -1)
                 predict_trajs[:, final_idx, :] = pred_goals_batch[i]
