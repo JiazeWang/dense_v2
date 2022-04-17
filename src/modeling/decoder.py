@@ -339,7 +339,8 @@ class Decoder(nn.Module):
 
                 predict_trajs = np.array(predict_trajs.tolist())
                 final_idx = mapping[i].get('final_idx', -1)
-                predict_trajs[:, final_idx, :] = pred_goals_batch[i]
+                # delete final point
+                #predict_trajs[:, final_idx, :] = pred_goals_batch[i]
                 mapping[i]['vis.predict_trajs'] = predict_trajs.copy()
 
                 if args.argoverse:
