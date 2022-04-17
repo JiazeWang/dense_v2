@@ -12,6 +12,39 @@ from modeling.lib import PointSubGraph, GlobalGraphRes, CrossAttention, GlobalGr
 import utils
 
 
+class TargetRefiner(nn.Module):
+    def __init__(self, hidden_size, in_features, out_features=2):
+        super(TargetRefiner, self).__init__()
+        self.mlp = MLP(in_features, hidden_size)
+        self.fc = nn.Linear(hidden_size + in_features, out_features)
+
+
+    def forward(self, hidden_states):
+        hidden_states = torch.cat([hidden_states, self.mlp(hidden_states)], dim=-1)
+        hidden_states = self.fc(hidden_states)
+        return hidden_states
+
+class TRefiner(nn.Module):
+    def __init__(self, hidden_size):
+        super(TRefiner, self).__init__()
+
+        self.pos_emb = nn.Sequential(
+            MLP(2, hidden_size),
+            MLP(hidden_size),
+            MLP(hidden_size)
+        )
+        self.TargetRefiner = TargetRefiner(hidden_size, hidden_size * 4, out_features=2)
+        self.future_frame_num = 30
+        self.complete_target_decoder_new = DecoderResCat(hidden_size, hidden_size * 4, 2)
+
+    def forward(self, input_feature, predict_target):
+        predict_target_feature = self.pos_emb(predict_target.reshape(2))
+        target_refine = self.TargetRefiner(torch.cat([input_feature, predict_target_feature], dim=-1))
+        predict_target_refine = self.complete_target_decoder_new(torch.cat([input_feature, target_refine], dim=-1)).view([2])
+        predict_target_refine = predict_target_refine + predict_target
+
+        return predict_target_refine
+
 class DecoderRes(nn.Module):
     def __init__(self, hidden_size, out_features=60):
         super(DecoderRes, self).__init__()
@@ -90,6 +123,7 @@ class Decoder(nn.Module):
             self.set_predict_decoders = nn.ModuleList(
                 [DecoderResCat(hidden_size, hidden_size * 2, out_features=13) for _ in range(args.other_params['set_predict'])])
 
+        self.TRefiner = TRefiner(hidden_size)
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
                                        hidden_states, device, loss):
         def get_stage_one_scores():
@@ -186,6 +220,12 @@ class Decoder(nn.Module):
                     [self.future_frame_num, 2])
             loss[i] += (F.smooth_l1_loss(predict_traj, torch.tensor(gt_points, dtype=torch.float, device=device), reduction='none') * \
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
+
+            input_feature = torch.cat([hidden_states[i, 0, :].detach(), target_feature, hidden_attention], dim=-1)
+            predict_target = self.TRefiner(input_feature, highest_goal)
+
+            loss[i] += (F.smooth_l1_loss(highest_goal, torch.tensor(gt_points[final_idx], dtype=torch.float, device=device)))
+            print("refine_loss:", (F.smooth_l1_loss(highest_goal, torch.tensor(gt_points[final_idx], dtype=torch.float, device=device))))
 
         loss[i] += F.nll_loss(scores.unsqueeze(0),
                               torch.tensor([mapping[i]['goals_2D_labels']], device=device))
