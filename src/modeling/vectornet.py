@@ -8,7 +8,7 @@ from torch import nn, Tensor
 from modeling.decoder import Decoder, DecoderResCat
 #from modeling.decoder_refine_target import Decoder, DecoderResCat
 from modeling.decoder_voting import Decoder, DecoderResCat
-#from modeling.lib import MLP, GlobalGraph, LayerNorm, CrossAttention, GlobalGraphRes_h
+from modeling.lib import MLP, GlobalGraph, LayerNorm, CrossAttention, GlobalGraphRes_h
 import utils
 
 
