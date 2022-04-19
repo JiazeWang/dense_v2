@@ -69,6 +69,8 @@ class Decoder(nn.Module):
             self.stage_one_cross_attention = CrossAttention(hidden_size)
             self.stage_one_decoder = DecoderResCat(hidden_size, hidden_size * 3, out_features=1)
             self.stage_one_goals_2D_decoder = DecoderResCat(hidden_size, hidden_size * 4, out_features=1)
+            #2D
+        self.offsets_2D_decoder = DecoderResCat(hidden_size, hidden_size * 4, out_features=2)
 
         if 'set_predict' in args.other_params:
             if args.do_train:
@@ -151,7 +153,7 @@ class Decoder(nn.Module):
         goals_2D = np.array(goals_2D_new.tolist())
         # print('len', len(goals_2D))
 
-        scores = self.get_scores(goals_2D_new, *get_scores_inputs)
+        scores, offsets = self.get_scores(goals_2D_new, *get_scores_inputs, get_offsets = True)
 
         index = torch.argmax(scores).item()
         point = np.array(goals_2D_new[index].tolist())
@@ -160,10 +162,10 @@ class Decoder(nn.Module):
             label = np.array(labels[i]).reshape([self.future_frame_num, 2])
             final_idx = mapping[i].get('final_idx', -1)
             mapping[i]['goals_2D_labels'] = np.argmin(utils.get_dis(goals_2D, label[final_idx]))
-        print("scores.shape:", scores.shape)
-        print("point.shape:", point.shape)
-        print("goals_2D.shape:", goals_2D.shape)
-        print(error)
+        #print("scores.shape:", scores.shape)
+        #print("point.shape:", point.shape)
+        #print("goals_2D.shape:", goals_2D.shape)
+        #print(error)
         return scores, point, goals_2D
 
     def goals_2D_per_example_calc_loss(self, i: int, goals_2D: np.ndarray, mapping: List[Dict], inputs: Tensor,
@@ -176,6 +178,7 @@ class Decoder(nn.Module):
         final_idx = mapping[i].get('final_idx', -1)
         gt_goal = gt_points[final_idx]
         DE[i][final_idx] = np.sqrt((highest_goal[0] - gt_points[final_idx][0]) ** 2 + (highest_goal[1] - gt_points[final_idx][1]) ** 2)
+
         if 'complete_traj' in args.other_params:
             target_feature = self.goals_2D_mlps(torch.tensor(gt_points[final_idx], dtype=torch.float, device=device))
             pass
@@ -393,7 +396,7 @@ class Decoder(nn.Module):
         else:
             assert False
 
-    def get_scores(self, goals_2D_tensor: Tensor, inputs, hidden_states, inputs_lengths, i, mapping, device):
+    def get_scores(self, goals_2D_tensor: Tensor, inputs, hidden_states, inputs_lengths, i, mapping, device, get_offsets = False):
         """
         :param goals_2D_tensor: candidate goals sampled from map (shape ['goal num', 2])
         :return: log scores of goals (shape ['goal num'])
@@ -422,7 +425,18 @@ class Decoder(nn.Module):
 
         scores = scores.squeeze(-1)
         scores = F.log_softmax(scores, dim=-1)
+
+        if get_offsets:
+            print("Calculating the offsets")
+            print("li.shape:", li.shape)
+            offsets = self.offsets_2D_decoder(torch.cat(li, dim=-1))
+            print("offsets.shape:", offsets.shape)
+            print(TestEnd)
+            return scores, offsets
         return scores
+
+
+
 
     def run_set_predict(self, goals_2D, scores, mapping, device, loss, i):
         gt_points = mapping[i]['labels'].reshape((self.future_frame_num, 2))
