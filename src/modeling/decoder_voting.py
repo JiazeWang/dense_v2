@@ -194,7 +194,7 @@ class Decoder(nn.Module):
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
 
         offsets_gt = torch.tensor(gt_points[final_idx] - goals_2D,  device=device, dtype=torch.float)
-        print("offset_gt.shape", offset_gt.shape)
+        print("offsets_gt.shape", offsets_gt.shape)
         print(TESTEND)
         loss[i] += F.nll_loss(scores.unsqueeze(0),
                               torch.tensor([mapping[i]['goals_2D_labels']], device=device))
