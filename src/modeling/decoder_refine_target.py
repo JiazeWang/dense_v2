@@ -324,9 +324,10 @@ class Decoder(nn.Module):
                 input_feature = torch.cat([hidden_states[i, 0, :].unsqueeze(0).expand(len(targets_feature), -1), targets_feature,
                            hidden_attention], dim=-1)
                 predict_target = self.TRefiner(input_feature, torch.tensor(pred_goals_batch[i], dtype=torch.float, device=device))
+                print("predict_target.shape", predict_target.shape)
                 predict_trajs = np.array(predict_trajs.tolist())
                 final_idx = mapping[i].get('final_idx', -1)
-                predict_trajs[:, final_idx, :] = predict_target
+                predict_trajs[:, final_idx, :] = predict_target.cpu().detach().numpy()
                 mapping[i]['vis.predict_trajs'] = predict_trajs.copy()
 
                 if args.argoverse:
