@@ -428,7 +428,7 @@ class Decoder(nn.Module):
 
         if get_offsets:
             print("Calculating the offsets")
-            print("li.shape:", li.shape)
+            print("li.shape:", torch.cat(li, dim=-1).shape)
             offsets = self.offsets_2D_decoder(torch.cat(li, dim=-1))
             print("offsets.shape:", offsets.shape)
             print(TestEnd)
