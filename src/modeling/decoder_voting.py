@@ -166,12 +166,12 @@ class Decoder(nn.Module):
         #print("point.shape:", point.shape)
         #print("goals_2D.shape:", goals_2D.shape)
         #print(error)
-        return scores, point, goals_2D
+        return scores, point, goals_2D, offsets
 
     def goals_2D_per_example_calc_loss(self, i: int, goals_2D: np.ndarray, mapping: List[Dict], inputs: Tensor,
                                        inputs_lengths: List[int], hidden_states: Tensor, device, loss: Tensor,
                                        DE: np.ndarray, gt_points: np.ndarray, scores: Tensor, highest_goal: np.ndarray,
-                                       labels_is_valid: List[np.ndarray]):
+                                       labels_is_valid: List[np.ndarray], offsets: Tensor):
         """
         Calculate loss for a training example
         """
@@ -193,6 +193,9 @@ class Decoder(nn.Module):
             loss[i] += (F.smooth_l1_loss(predict_traj, torch.tensor(gt_points, dtype=torch.float, device=device), reduction='none') * \
                         torch.tensor(labels_is_valid[i], dtype=torch.float, device=device).view(self.future_frame_num, 1)).mean()
 
+        offsets_gt = gt_points[final_idx] - torch.tensor(goals_2D, device=device, dtype=torch.float)
+        print("offset_gt.shape", offset_gt.shape)
+        print(TESTEND)
         loss[i] += F.nll_loss(scores.unsqueeze(0),
                               torch.tensor([mapping[i]['goals_2D_labels']], device=device))
 
@@ -228,14 +231,14 @@ class Decoder(nn.Module):
         highest_goal = goals_2D[index]
 
         if 'lazy_points' in args.other_params:
-            scores, highest_goal, goals_2D = \
+            scores, highest_goal, goals_2D, offsets = \
                 self.goals_2D_per_example_lazy_points(i, goals_2D, mapping, labels, device, scores,
                                                       get_scores_inputs, stage_one_topk_ids, gt_points)
             index = None
 
         if args.do_train:
             self.goals_2D_per_example_calc_loss(i, goals_2D, mapping, inputs, inputs_lengths,
-                                                hidden_states, device, loss, DE, gt_points, scores, highest_goal, labels_is_valid)
+                                                hidden_states, device, loss, DE, gt_points, scores, highest_goal, labels_is_valid, offsets)
 
         if args.visualize:
             mapping[i]['vis.goals_2D'] = goals_2D
@@ -427,12 +430,13 @@ class Decoder(nn.Module):
         scores = F.log_softmax(scores, dim=-1)
 
         if get_offsets:
-            print("Calculating the offsets")
-            print("li.shape:", torch.cat(li, dim=-1).shape)
+            #print("Calculating the offsets")
+            #print("li.shape:", torch.cat(li, dim=-1).shape)
             offsets = self.offsets_2D_decoder(torch.cat(li, dim=-1))
-            print("offsets.shape:", offsets.shape)
-            print(TestEnd)
+            #print("offsets.shape:", offsets.shape)
+            #print(TestEnd)
             return scores, offsets
+
         return scores
 
 
