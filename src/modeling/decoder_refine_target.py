@@ -38,9 +38,9 @@ class TRefiner(nn.Module):
         self.complete_target_decoder_new = DecoderResCat(hidden_size, hidden_size * 4, 2)
 
     def forward(self, input_feature, predict_target):
-        predict_target_feature = self.pos_emb(predict_target.reshape(2))
+        predict_target_feature = self.pos_emb(predict_target.reshape(-1, 2))
         #print("input_feature:",input_feature.shape, target_refine.shape)
-        predict_target_refine = self.complete_target_decoder_new(torch.cat([input_feature, predict_target_feature], dim=-1)).view([2])
+        predict_target_refine = self.complete_target_decoder_new(torch.cat([input_feature, predict_target_feature], dim=-1)).view([-1, 2])
         predict_target_refine = predict_target_refine + predict_target
 
         return predict_target_refine
@@ -321,9 +321,12 @@ class Decoder(nn.Module):
                 predict_trajs = self.complete_traj_decoder(
                     torch.cat([hidden_states[i, 0, :].unsqueeze(0).expand(len(targets_feature), -1), targets_feature,
                                hidden_attention], dim=-1)).view([self.mode_num, self.future_frame_num, 2])
+                input_feature = torch.cat([hidden_states[i, 0, :].unsqueeze(0).expand(len(targets_feature), -1), targets_feature,
+                           hidden_attention], dim=-1)
+                predict_target = self.TRefiner(input_feature, torch.tensor(pred_goals_batch[i], dtype=torch.float, device=device))
                 predict_trajs = np.array(predict_trajs.tolist())
                 final_idx = mapping[i].get('final_idx', -1)
-                predict_trajs[:, final_idx, :] = pred_goals_batch[i]
+                predict_trajs[:, final_idx, :] = predict_target
                 mapping[i]['vis.predict_trajs'] = predict_trajs.copy()
 
                 if args.argoverse:
