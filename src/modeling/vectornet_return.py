@@ -175,7 +175,7 @@ class VectorNet(nn.Module):
 
         utils.logging('time3', round(time.time() - starttime, 2), 'secs')
         scores, goals_2D, offsets = self.decoder(mapping, batch_size, lane_states_batch, inputs, inputs_lengths, hidden_states, device)
-        print("scores.shape:", scores.shape)
-        print("goals_2D.shape:", goals_2D.shape)
-        print("offsets.shape:", offsets.shape)
+        goals_2D = torch.tensor(goals_2D, dtype=torch.float, device=device)
+        tensor = torch.cat([goals_2D, scores, offsets], dim = 1)
+        print("tensor.shape:", tensor.shape)
         return error
