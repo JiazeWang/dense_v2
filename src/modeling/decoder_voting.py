@@ -290,9 +290,12 @@ class Decoder(nn.Module):
         if len(goals_new) >=6:
             goals_return = np.stack(goals_new, axis=0)
             scores_return = np.stack(scores_new, axis=0)
-        else:
+        elif len(scores_new_16)>=6::
             goals_return = np.stack(goals_new_16, axis=0)
             scores_return = np.stack(scores_new_16, axis=0)
+        else:
+            goals_return = goals_2D
+            scores_return = scores
         #print("goals_new.shape", goals_new.shape, "goals_2D.shape", goals_2D.shape)
 
         return goals_return, scores_return
