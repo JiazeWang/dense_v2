@@ -259,7 +259,7 @@ class Decoder(nn.Module):
         final_idx = mapping[i].get('final_idx', -1)
         gt_goal = gt_points[final_idx]
         distance = np.zeros([6])
-        for in in range(0, 6):
+        for i in in range(0, 6):
             distance[i] = np.sqrt((tensor_decoder[1] - gt_points[final_idx][0]) ** 2 + (tensor_decoder[2] - gt_points[final_idx][1]) ** 2)
         index = torch.argmin(distance)
         final_point = tensor_decoder[index][1:]
