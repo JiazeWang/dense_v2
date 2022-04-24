@@ -262,7 +262,7 @@ class Decoder(nn.Module):
         distance = np.zeros([6])
         scores = torch.zeros([6]).to(device)
         for i in  range(0, 6):
-            distance[i] = (tensor_decoder[i][1] - torch.tensor(gt_points[final_idx][0], dtype=torch.float, device=device)) ** 2 \\
+            distance[i] = (tensor_decoder[i][1] - torch.tensor(gt_points[final_idx][0], dtype=torch.float, device=device)) ** 2 \
                             + (tensor_decoder[i][2] - torch.tensor(gt_points[final_idx][1], dtype=torch.float, device=device)) ** 2
             if distance[i]>=4:
                 scores[i] = 0
