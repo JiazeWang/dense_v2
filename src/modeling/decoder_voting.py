@@ -276,7 +276,7 @@ class Decoder(nn.Module):
         goals_new = []
         scores_new = []
         for i in range(0, goals_2D.shape[0]):
-            distance = offsets[i][0]*offsets[i][0]+offsets[i][1]*offsets[i][1]<=4
+            distance = offsets[i][0]*offsets[i][0]+offsets[i][1]*offsets[i][1]
             print(distance)
             if distance<=4:
                 goals_new.append(goals_2D[i])
