@@ -517,7 +517,7 @@ class Decoder(nn.Module):
                 dynamic_label = torch.tensor(dynamic_label, device=device, dtype=torch.float)
                 #print("dynamic_label.shape:", dynamic_label)
                 input = torch.cat([predicts[min_cost_idx].reshape(1,12), dynamic_label.reshape(1,12)], dim = 0)
-                print("input:", input)
+                #print("input:", input)
                 validity = self.set_dis(input)
                 validity = F.softmax(validity, dim = -1)
                 validity_gt = torch.tensor([0, 1], device = device)
