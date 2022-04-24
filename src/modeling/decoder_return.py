@@ -255,7 +255,7 @@ class Decoder(nn.Module):
         tensor = torch.cat([goals_2D, scores, offsets], dim = 1)[topk_ids]
         print("tensor.shape:", tensor.shape)
         tensor_encode = self.feature_encoder(tensor).reshape(1000)
-        tensor_decoder = self.feature_decoder(tensor).reshape(6, 2)
+        tensor_decoder = self.feature_decoder(tensor_encode).reshape(6, 2)
         print("tensor_decoder.shape",tensor_decoder.shape)
         return scores, goals_2D, offsets
 
