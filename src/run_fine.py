@@ -64,10 +64,7 @@ def learning_rate_decay(args, i_epoch, optimizer, optimizer_2=None):
             for p in optimizer.param_groups:
                 p['lr'] *= 0.3
 
-        if 'complete_traj-3' in args.other_params:
-            if i_epoch > 0 and i_epoch % 5 == 0:
-                for p in optimizer_2.param_groups:
-                    p['lr'] *= 0.3
+
 
 
 def gather_and_output_motion_metrics(args, device, queue, motion_metrics, metric_names, MotionMetrics):
@@ -261,7 +258,7 @@ def demo_basic(rank, world_size, kwargs, queue):
 
     for i_epoch in range(int(args.num_train_epochs)):
         if 'complete_traj-3' in args.other_params:
-            learning_rate_decay(args, i_epoch, optimizer, optimizer_2)
+            learning_rate_decay(args, i_epoch, optimizer)
         else:
             learning_rate_decay(args, i_epoch, optimizer)
         utils.logging(optimizer.state_dict()['param_groups'])
@@ -275,7 +272,7 @@ def demo_basic(rank, world_size, kwargs, queue):
             iter_bar = train_dataloader
 
         if 'complete_traj-3' in args.other_params:
-            train_one_epoch(model, iter_bar, optimizer, rank, args, i_epoch, queue, optimizer_2)
+            train_one_epoch(model, iter_bar, optimizer, rank, args, i_epoch, queue)
         else:
             train_one_epoch(model, iter_bar, optimizer, rank, args, i_epoch, queue)
 
