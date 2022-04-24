@@ -520,8 +520,8 @@ class Decoder(nn.Module):
                 validity = self.set_dis(torch.cat([predicts[min_cost_idx].reshape(1,12), dynamic_label.reshape(1,12)], dim = 0))
                 validity = F.softmax(validity, dim = -1)
                 validity_gt = torch.tensor([[1,0], [0,1]], device = device)
-                print("validity.shape:", validity.shape)
-                print("validity_gt.shape", validity_gt.shape)
+                print("validity.shape:", validity)
+                print("validity_gt.shape", validity_gt)
 
 
                 loss[i] += 2.0 * F.l1_loss(predicts[min_cost_idx], dynamic_label)
