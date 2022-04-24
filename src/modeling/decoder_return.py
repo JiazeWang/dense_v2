@@ -101,7 +101,7 @@ class Decoder(nn.Module):
         self.feature_decoder = nn.Sequential(
             MLP(1000, hidden_size),
             MLP(hidden_size),
-            MLP(hidden_size, 12)
+            MLP(hidden_size, 18)
         )
 
 
@@ -253,10 +253,23 @@ class Decoder(nn.Module):
         topk_ids = topk_ids.cpu().numpy()
         scores = scores.reshape(-1, 1)
         tensor = torch.cat([goals_2D, scores, offsets], dim = 1)[topk_ids]
-        print("tensor.shape:", tensor.shape)
+        #print("tensor.shape:", tensor.shape)
         tensor_encode = self.feature_encoder(tensor).reshape(1000)
-        tensor_decoder = self.feature_decoder(tensor_encode).reshape(6, 2)
-        print("tensor_decoder.shape",tensor_decoder.shape)
+        tensor_decoder = self.feature_decoder(tensor_encode).reshape(6, 3)
+        final_idx = mapping[i].get('final_idx', -1)
+        gt_goal = gt_points[final_idx]
+        distance = np.zeros([6])
+        for in in range(0, 6)
+            distance[i] = np.sqrt((tensor_decoder[1] - gt_points[final_idx][0]) ** 2 + (tensor_decoder[2] - gt_points[final_idx][1]) ** 2)
+        index = torch.argmin(distance)
+        final_point = tensor_decoder[index][1:]
+        final_point_gt = torch.tensor(goals_2D, dtype=torch.float, device=device)
+        print(scores.shape, final_point_gt.shape)
+        loss[i] += F.smooth_l1_loss(scores.unsqueeze(0), final_point_gt)
+        final_scores = tensor_decoder[;, 0]
+        print(final_scores.shape, index.shape)
+        loss[i] += F.nll_loss(final_scores, index)
+        print("loss[i]:", loss[i])
         return scores, goals_2D, offsets
 
 
