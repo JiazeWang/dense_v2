@@ -105,7 +105,7 @@ class Decoder(nn.Module):
             stage_one_scores = self.stage_one_decoder(torch.cat([hidden_states[i, 0, :].unsqueeze(0).expand(
                 stage_one_hidden.shape), stage_one_hidden, stage_one_hidden_attention], dim=-1))
             stage_one_scores = stage_one_scores.squeeze(-1)
-            stage_one_scores = F.log_softmax(stage_one_scores, dim=-1)
+            #stage_one_scores = F.log_softmax(stage_one_scores, dim=-1)
             return stage_one_scores
 
         stage_one_scores = get_stage_one_scores()
