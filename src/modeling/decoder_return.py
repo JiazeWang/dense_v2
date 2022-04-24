@@ -234,6 +234,14 @@ class Decoder(nn.Module):
             scores, highest_goal, goals_2D, offsets = \
                 self.goals_2D_per_example_lazy_points(i, goals_2D, mapping, labels, device, scores,
                                                       get_scores_inputs, stage_one_topk_ids, gt_points)
+        #get input
+        goals_2D = torch.tensor(goals_2D, dtype=torch.float, device=device)
+        _, topk_ids = torch.topk(tensor, 1000)
+        topk_ids = topk_ids.cpu().numpy()
+        scores = scores.reshape(-1, 1)
+        tensor = torch.cat([goals_2D, scores, offsets], dim = 1)[topk_ids]
+        print("tensor.shape:", tensor.shape)
+
         return scores, goals_2D, offsets
 
 
