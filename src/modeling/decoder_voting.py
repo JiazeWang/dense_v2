@@ -290,7 +290,7 @@ class Decoder(nn.Module):
         if len(goals_new) >=6:
             goals_return = np.stack(goals_new, axis=0)
             scores_return = np.stack(scores_new, axis=0)
-        elif len(scores_new_16)>=6::
+        elif len(scores_new_16)>=6:
             goals_return = np.stack(goals_new_16, axis=0)
             scores_return = np.stack(scores_new_16, axis=0)
         else:
