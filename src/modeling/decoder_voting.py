@@ -258,6 +258,11 @@ class Decoder(nn.Module):
                 if args.nms_threshold is not None:
                     utils.select_goals_by_NMS(mapping[i], goals_2D, np.array(scores.tolist()), args.nms_threshold, mapping[i]['speed'])
                 elif 'optimization' in args.other_params:
+                    print("goals_2D.shape:", goal_2D.shape)
+                    print("offsets.shape:", offsets.shape)
+                    goals_2D = goals_2D + offsets
+                    print("new.shape:", goals_2D.shape)
+                    print(error)
                     mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores.tolist(), dtype=np.float32)
                 else:
                     assert False
