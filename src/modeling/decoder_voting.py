@@ -277,13 +277,13 @@ class Decoder(nn.Module):
         scores_new = []
         for i in range(0, goals_2D.shape[0]):
             distance = offsets[i][0]*offsets[i][0]+offsets[i][1]*offsets[i][1]
-            print(distance)
+            #print(distance)
             if distance<=4:
                 goals_new.append(goals_2D[i])
                 scores_new.append(scores[i])
         goals_new = np.stack(goals_new, axis=0)
         scores_new = np.stack(scores_new, axis=0)
-        print("goals_new.shape", goals_new.shape, "goals_2D.shape", goals_2D.shape)
+        #print("goals_new.shape", goals_new.shape, "goals_2D.shape", goals_2D.shape)
 
         return goals_new, scores_new
 
