@@ -260,14 +260,14 @@ class Decoder(nn.Module):
         final_idx = mapping[i].get('final_idx', -1)
         gt_goal = gt_points[final_idx]
         distance = np.zeros([6])
-        scores = torch.zeros([6]).to(device)
-        for i in  range(0, 6):
+        scores_new = torch.zeros([6]).to(device)
+        for i in range(0, 6):
             distance[i] = (tensor_decoder[i][1] - torch.tensor(gt_points[final_idx][0], dtype=torch.float, device=device)) ** 2 \
                             + (tensor_decoder[i][2] - torch.tensor(gt_points[final_idx][1], dtype=torch.float, device=device)) ** 2
             if distance[i]>=4:
-                scores[i] = 0
+                scores_new[i] = 0
             else:
-                scores[i] = 1 - torch.sqrt(distance[i]) / 2
+                scores_new[i] = 1 - torch.sqrt(distance[i]) / 2
 
 
         index = np.argmin(distance)
@@ -277,7 +277,7 @@ class Decoder(nn.Module):
         loss[i] += F.smooth_l1_loss(scores, final_point_gt)
         final_scores = tensor_decoder[:, 0]
         print("final_scores.shape, index.shape", final_scores.shape, index.shape)
-        loss[i] += F.nll_loss(final_scores.unsqueeze(0), torch.tensor([index], device=device))
+        loss[i] += F.nll_loss(final_scores.unsqueeze(0), scores_new, device=device))
         print("loss[i]:", loss[i])
         return scores, goals_2D, offsets
 
