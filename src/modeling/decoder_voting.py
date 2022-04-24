@@ -275,7 +275,7 @@ class Decoder(nn.Module):
     def get_new_goals(self, goals_2D, offsets, scores):
         goals_new = []
         scores_new = []
-        for i in range(0, goal_2D.shape[0]):
+        for i in range(0, goals_2D.shape[0]):
             if offsets[i][0]*offsets[i][0]+offsets[i][1]*offsets[i][1]<=4:
                 goals_new.append(goals_2D[i])
                 scores_new.append(scores[i])
