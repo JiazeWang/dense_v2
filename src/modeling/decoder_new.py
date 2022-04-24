@@ -93,7 +93,7 @@ class Decoder(nn.Module):
             self.set_dis = nn.Sequential(
                 MLP(12, hidden_size),
                 MLP(hidden_size),
-                MLP(hidden_size, 1)
+                MLP(hidden_size, 2)
             )
 
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
@@ -523,7 +523,7 @@ class Decoder(nn.Module):
                 print("validity.shape:", validity)
                 #print("validity_gt.shape", validity_gt)
                 if i%2 == 0:
-                    loss[i] += F.cross_entropy(validity.squeeze(), validity_gt)
+                    loss[i] += F.cross_entropy(validity, validity_gt)
 
                 if i%2 == 1:
                     loss[i] += 2.0 * F.l1_loss(predicts[min_cost_idx], dynamic_label)
