@@ -92,6 +92,19 @@ class Decoder(nn.Module):
             self.set_predict_decoders = nn.ModuleList(
                 [DecoderResCat(hidden_size, hidden_size * 2, out_features=13) for _ in range(args.other_params['set_predict'])])
 
+            self.feature_encoder = nn.Sequential(
+                MLP(5, hidden_size),
+                MLP(hidden_size),
+                MLP(hidden_size, 1)
+            )
+
+            self.feature_decoder = nn.Sequential(
+                MLP(1000, hidden_size),
+                MLP(hidden_size),
+                MLP(hidden_size, 12)
+            )
+
+
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
                                        hidden_states, device, loss):
         def get_stage_one_scores():
@@ -241,7 +254,9 @@ class Decoder(nn.Module):
         scores = scores.reshape(-1, 1)
         tensor = torch.cat([goals_2D, scores, offsets], dim = 1)[topk_ids]
         print("tensor.shape:", tensor.shape)
-
+        tensor_encode = self.feature_encoder(tensor).reshape(1000)
+        tensor_decoder = self.feature_decoder(tensor).reshape(6, 2)
+        print("tensor_decoder.shape",tensor_decoder.shape)
         return scores, goals_2D, offsets
 
 
