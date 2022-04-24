@@ -90,6 +90,12 @@ class Decoder(nn.Module):
             self.set_predict_decoders = nn.ModuleList(
                 [DecoderResCat(hidden_size, hidden_size * 2, out_features=13) for _ in range(args.other_params['set_predict'])])
 
+            self.set_dis = nn.Sequential(
+                MLP(12, hidden_size),
+                MLP(hidden_size),
+                MLP(hidden_size, 2)
+            )
+
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
                                        hidden_states, device, loss):
         def get_stage_one_scores():
@@ -510,6 +516,14 @@ class Decoder(nn.Module):
                 print("predicts[min_cost_idx].shape:", predicts[min_cost_idx].shape)
                 dynamic_label = torch.tensor(dynamic_label, device=device, dtype=torch.float)
                 print("dynamic_label.shape:", dynamic_label.shape)
+
+                validity = self.set_dis(torch.cat([predicts[min_cost_idx].reshape(1,12), dynamic_label.reshape(1,12)], dim = 0))
+                validity = F.softmax(validity, dim = -1)
+                validity_gt = torch.tensor([[1,0], [0,1]], device = device)
+                print("validity.shape:", validity.shape)
+                print("validity_gt.shape", validity_gt.shape)
+
+
                 loss[i] += 2.0 * F.l1_loss(predicts[min_cost_idx], dynamic_label)
 
             loss[i] += F.nll_loss(group_scores.unsqueeze(0), torch.tensor([min_cost_idx], device=device))
