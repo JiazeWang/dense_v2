@@ -4,7 +4,7 @@ GPU_NUM=4; \
 python src/run.py --argoverse --future_frame_num 30 \
   --do_train --data_dir train/data/ --output_dir ${OUTPUT_DIR} \
   --hidden_size 128 --train_batch_size 64 --use_map \
-  --core_num 16 --use_centerline --distributed_training ${GPU_NUM} --reuse_temp_file --temp_file_dir /research/dept7/zxzhao/jzwang/DenseTNT/output \
+  --core_num 16 --use_centerline --distributed_training ${GPU_NUM} --reuse_temp_file --temp_file_dir ../DenseTNT/output \
   --other_params \
     semantic_lane direction l1_loss \
     goals_2D enhance_global_graph subdivide lazy_points new laneGCN point_sub_graph \
