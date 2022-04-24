@@ -260,12 +260,33 @@ class Decoder(nn.Module):
                 elif 'optimization' in args.other_params:
                     #print("goals_2D.shape:", goals_2D.shape)
                     #print("offsets.shape:", offsets)
+                    """
                     goals_2D = goals_2D + offsets.detach().cpu().numpy()
-                    #print("new.shape:", goals_2D.shape)
+                    #print("new.shape:", goals_2D.shape)\
+
                     mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores.tolist(), dtype=np.float32)
+                    """
+                    goal_2D_new, scores_new = self.get_new_goals(goals_2D, offsets.cpu().numpy(), scores)
+                    mapping[i]['goals_2D_scores'] = goal_2D_new.astype(np.float32), np.array(scores_new.tolist(), dtype=np.float32)
                     #print("mapping[i]:", mapping[i]['goals_2D_scores'][0].shape, mapping[i]['goals_2D_scores'][1].shape)
                 else:
                     assert False
+
+    def get_new_goals(self, goals_2D, offsets, scores):
+        goals_new = []
+        scores_new = []
+        for i in range(0, goal_2D.shape[0]):
+            if offsets[i][0]*offsets[i][0]+offsets[i][1]*offsets[i][1]<=4:
+                goals_new.append(goals_2D[i])
+                scores_new.append(scores[i])
+        goals_new = np.concatenate(goals_new, axis=0)
+        scores_new = np.concatenate(scores_new, axis=0)
+        print("goals_new.shape", goals_new.shape, "goals_2D.shape", goals_2D.shape)
+
+        return goals_new, scores_new
+
+
+
 
     def goals_2D_eval(self, batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device):
         if 'set_predict' in args.other_params:
