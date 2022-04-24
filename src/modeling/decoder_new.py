@@ -521,10 +521,12 @@ class Decoder(nn.Module):
                 validity = F.softmax(validity, dim = -1)
                 validity_gt = torch.tensor([[1,0], [0,1]], device = device)
                 print("validity.shape:", validity)
-                print("validity_gt.shape", validity_gt)
+                #print("validity_gt.shape", validity_gt)
+                if i%2 == 0:
+                    loss[i] += F.cross_entropy(validity, validity_gt)
 
-
-                loss[i] += 2.0 * F.l1_loss(predicts[min_cost_idx], dynamic_label)
+                if i%2 == 1:
+                    loss[i] += 2.0 * F.l1_loss(predicts[min_cost_idx], dynamic_label)
 
             loss[i] += F.nll_loss(group_scores.unsqueeze(0), torch.tensor([min_cost_idx], device=device))
 
