@@ -513,14 +513,15 @@ class Decoder(nn.Module):
                                                                       lr=args.set_predict_lr, kwargs=kwargs)
                 # loss[i] += 2.0 / globals.set_predict_lr * \
                 #            F.l1_loss(predicts[min_cost_idx], torch.tensor(dynamic_label, device=device, dtype=torch.float))
-                print("predicts[min_cost_idx].shape:", predicts[min_cost_idx])
+                #print("predicts[min_cost_idx].shape:", predicts[min_cost_idx])
                 dynamic_label = torch.tensor(dynamic_label, device=device, dtype=torch.float)
-                print("dynamic_label.shape:", dynamic_label)
-
-                validity = self.set_dis(torch.cat([predicts[min_cost_idx].reshape(1,12), dynamic_label.reshape(1,12)], dim = 0))
+                #print("dynamic_label.shape:", dynamic_label)
+                input = torch.cat([predicts[min_cost_idx].reshape(1,12), dynamic_label.reshape(1,12)], dim = 0)
+                print("input:", input)
+                validity = self.set_dis(input)
                 validity = F.softmax(validity, dim = -1)
                 validity_gt = torch.tensor([0, 1], device = device)
-                print("validity.shape:", validity)
+                print("validity:", validity)
                 #print("validity_gt.shape", validity_gt)
                 if i%2 == 0:
                     loss[i] += F.cross_entropy(validity, validity_gt)
