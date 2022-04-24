@@ -260,8 +260,16 @@ class Decoder(nn.Module):
         final_idx = mapping[i].get('final_idx', -1)
         gt_goal = gt_points[final_idx]
         distance = np.zeros([6])
+        scores = torch.zeros([6]).to(device)
         for i in  range(0, 6):
-            distance[i] = np.sqrt((tensor_decoder[i][1].detach().cpu().numpy() - gt_points[final_idx][0]) ** 2 + (tensor_decoder[i][2].detach().cpu().numpy() - gt_points[final_idx][1]) ** 2)
+            distance[i] = (tensor_decoder[i][1] - torch.tensor(gt_points[final_idx][0], dtype=torch.float, device=device)) ** 2 \\
+                            + (tensor_decoder[i][2] - torch.tensor(gt_points[final_idx][1], dtype=torch.float, device=device)) ** 2
+            if distance[i]>=4:
+                scores[i] = 0
+            else:
+                scores[i] = 1 - torch.sqrt(distance[i]) / 2
+
+
         index = np.argmin(distance)
         final_point = tensor_decoder[index][1:]
         final_point_gt = torch.tensor(goals_2D, dtype=torch.float, device=device)
