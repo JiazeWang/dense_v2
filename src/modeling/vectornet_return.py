@@ -174,5 +174,5 @@ class VectorNet(nn.Module):
         hidden_states = self.global_graph(inputs, attention_mask, mapping)
 
         utils.logging('time3', round(time.time() - starttime, 2), 'secs')
-        scores, goals_2D, offsets = self.decoder(mapping, batch_size, lane_states_batch, inputs, inputs_lengths, hidden_states, device)
-        return error
+        #scores, goals_2D, offsets = self.decoder(mapping, batch_size, lane_states_batch, inputs, inputs_lengths, hidden_states, device)
+        return self.decoder(mapping, batch_size, lane_states_batch, inputs, inputs_lengths, hidden_states, device)

@@ -264,21 +264,24 @@ class Decoder(nn.Module):
         for i in range(0, 6):
             distance[i] = (tensor_decoder[i][1] - torch.tensor(gt_points[final_idx][0], dtype=torch.float, device=device)) ** 2 \
                             + (tensor_decoder[i][2] - torch.tensor(gt_points[final_idx][1], dtype=torch.float, device=device)) ** 2
+
             if distance[i]>=4:
                 scores_new[i] = 0
             else:
                 scores_new[i] = 1 - torch.sqrt(distance[i]) / 2
 
         index = np.argmin(distance)
+        distance_min = np.min(distance)
+        DE[i][final_idx] = np.sqrt(distance_min)
         final_point = tensor_decoder[index][1:]
         final_point_gt = torch.tensor(gt_goal, dtype=torch.float, device=device)
-        print("final_point.shape, final_point_gt.shape",final_point.shape, final_point_gt.shape)
+        #print("final_point.shape, final_point_gt.shape",final_point.shape, final_point_gt.shape)
         loss[i] += F.smooth_l1_loss(final_point, final_point_gt)
         final_scores = tensor_decoder[:, 0]
-        print("final_scores.shape, scores_new.shape", final_scores.shape, scores_new.shape)
+        #print("final_scores.shape, scores_new.shape", final_scores.shape, scores_new.shape)
         loss[i] += F.binary_cross_entropy(final_scores, scores_new)
-        print("loss[i]:", loss[i])
-        return scores, goals_2D, offsets
+        #print("loss[i]:", loss[i])
+        #return scores, goals_2D, offsets
 
 
 
@@ -392,10 +395,10 @@ class Decoder(nn.Module):
             for i in range(batch_size):
                 goals_2D = mapping[i]['goals_2D']
 
-                scores, goals_2D, offsets = self.goals_2D_per_example(i, goals_2D, mapping, lane_states_batch, inputs, inputs_lengths,
+                self.goals_2D_per_example(i, goals_2D, mapping, lane_states_batch, inputs, inputs_lengths,
                                           hidden_states, labels, labels_is_valid, device, loss, DE)
 
-        return scores, goals_2D, offsets
+        return loss.mean(), DE, None
 
     def get_scores(self, goals_2D_tensor: Tensor, inputs, hidden_states, inputs_lengths, i, mapping, device, get_offsets = False):
         """
