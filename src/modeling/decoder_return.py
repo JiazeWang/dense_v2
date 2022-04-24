@@ -266,7 +266,7 @@ class Decoder(nn.Module):
         final_point_gt = torch.tensor(goals_2D, dtype=torch.float, device=device)
         print(scores.shape, final_point_gt.shape)
         loss[i] += F.smooth_l1_loss(scores.unsqueeze(0), final_point_gt)
-        final_scores = tensor_decoder[;, 0]
+        final_scores = tensor_decoder[:, 0]
         print(final_scores.shape, index.shape)
         loss[i] += F.nll_loss(final_scores, index)
         print("loss[i]:", loss[i])
