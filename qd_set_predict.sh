@@ -1,4 +1,4 @@
-OUTPUT_DIR=set_EV2_0_add_lane_gcn; \
+OUTPUT_DIR=gan_set_EV2_0_add_lane_gcn; \
 MODEL_PATH=EV2_1_add_global_graph/model_save/model.16.bin; \
 GPU_NUM=4; \
 python src/run.py --argoverse --future_frame_num 30 \
