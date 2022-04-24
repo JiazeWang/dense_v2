@@ -234,8 +234,6 @@ class Decoder(nn.Module):
             scores, highest_goal, goals_2D, offsets = \
                 self.goals_2D_per_example_lazy_points(i, goals_2D, mapping, labels, device, scores,
                                                       get_scores_inputs, stage_one_topk_ids, gt_points)
-            index = None
-
         return scores, goals_2D, offsets
 
 
