@@ -277,7 +277,7 @@ class Decoder(nn.Module):
         final_point_gt = torch.tensor(gt_goal, dtype=torch.float, device=device)
         #print("final_point.shape, final_point_gt.shape",final_point.shape, final_point_gt.shape)
         loss[i] += F.smooth_l1_loss(final_point, final_point_gt)
-        final_scores = tensor_decoder[:, 0]
+        final_scores = F.softmax(tensor_decoder[:, 0])
         #print("final_scores.shape, scores_new.shape", final_scores.shape, scores_new.shape)
         loss[i] += F.binary_cross_entropy(final_scores, scores_new)
         #print("loss[i]:", loss[i])
