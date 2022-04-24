@@ -93,7 +93,7 @@ class Decoder(nn.Module):
             self.set_dis = nn.Sequential(
                 MLP(12, hidden_size),
                 MLP(hidden_size),
-                MLP(hidden_size, 2)
+                MLP(hidden_size, 1)
             )
 
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
@@ -519,7 +519,7 @@ class Decoder(nn.Module):
 
                 validity = self.set_dis(torch.cat([predicts[min_cost_idx].reshape(1,12), dynamic_label.reshape(1,12)], dim = 0))
                 validity = F.softmax(validity, dim = -1)
-                validity_gt = torch.tensor([[1,0], [0,1]], device = device)
+                validity_gt = torch.tensor([[0], [1]], device = device)
                 print("validity.shape:", validity)
                 #print("validity_gt.shape", validity_gt)
                 if i%2 == 0:
