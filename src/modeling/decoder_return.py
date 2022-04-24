@@ -236,7 +236,7 @@ class Decoder(nn.Module):
                                                       get_scores_inputs, stage_one_topk_ids, gt_points)
         #get input
         goals_2D = torch.tensor(goals_2D, dtype=torch.float, device=device)
-        _, topk_ids = torch.topk(tensor, 1000)
+        _, topk_ids = torch.topk(scores, 1000)
         topk_ids = topk_ids.cpu().numpy()
         scores = scores.reshape(-1, 1)
         tensor = torch.cat([goals_2D, scores, offsets], dim = 1)[topk_ids]
