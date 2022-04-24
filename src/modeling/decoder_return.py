@@ -236,69 +236,8 @@ class Decoder(nn.Module):
                                                       get_scores_inputs, stage_one_topk_ids, gt_points)
             index = None
 
-        if args.do_train:
-            self.goals_2D_per_example_calc_loss(i, goals_2D, mapping, inputs, inputs_lengths,
-                                                hidden_states, device, loss, DE, gt_points, scores, highest_goal, labels_is_valid, offsets)
+        return scores, goals_2D, offsets
 
-        if args.visualize:
-            mapping[i]['vis.goals_2D'] = goals_2D
-            mapping[i]['vis.scores'] = np.array(scores.tolist())
-            mapping[i]['vis.labels'] = gt_points
-            mapping[i]['vis.labels_is_valid'] = labels_is_valid[i]
-
-        if 'set_predict' in args.other_params:
-            self.run_set_predict(goals_2D, scores, mapping, device, loss, i)
-            if args.visualize:
-                set_predict_ans_points = mapping[i]['set_predict_ans_points']
-                predict_trajs = np.zeros((6, self.future_frame_num, 2))
-                predict_trajs[:, -1, :] = set_predict_ans_points
-
-        else:
-            if args.do_eval:
-                if args.nms_threshold is not None:
-                    utils.select_goals_by_NMS(mapping[i], goals_2D, np.array(scores.tolist()), args.nms_threshold, mapping[i]['speed'])
-                elif 'optimization' in args.other_params:
-                    #print("goals_2D.shape:", goals_2D.shape)
-                    #print("offsets.shape:", offsets)
-                    """
-                    goals_2D = goals_2D + offsets.detach().cpu().numpy()
-                    #print("new.shape:", goals_2D.shape)\
-
-                    mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores.tolist(), dtype=np.float32)
-                    """
-                    goal_2D_new, scores_new = self.get_new_goals(goals_2D, offsets.detach().cpu().numpy(), scores.detach().cpu().numpy())
-                    mapping[i]['goals_2D_scores'] = goal_2D_new.astype(np.float32), np.array(scores_new.tolist(), dtype=np.float32)
-                    #print("mapping[i]:", mapping[i]['goals_2D_scores'][0].shape, mapping[i]['goals_2D_scores'][1].shape)
-                else:
-                    assert False
-
-    def get_new_goals(self, goals_2D, offsets, scores):
-        goals_new = []
-        scores_new = []
-        goals_new_16 = []
-        scores_new_16 = []
-        for i in range(0, goals_2D.shape[0]):
-            distance = offsets[i][0]*offsets[i][0]+offsets[i][1]*offsets[i][1]
-            #print(distance)
-            if distance<=4:
-                goals_new.append(goals_2D[i])
-                scores_new.append(scores[i])
-            if distance<=100:
-                goals_new_16.append(goals_2D[i])
-                scores_new_16.append(scores[i])
-
-        if len(goals_new) >=6:
-            goals_return = np.stack(goals_new, axis=0)
-            scores_return = np.stack(scores_new, axis=0)
-        elif len(scores_new_16)>=6:
-            goals_return = np.stack(goals_new_16, axis=0)
-            scores_return = np.stack(scores_new_16, axis=0)
-        else:
-            goals_return = goals_2D
-            scores_return = scores
-        #print("goals_new.shape", goals_new.shape, "goals_2D.shape", goals_2D.shape)
-
-        return goals_return, scores_return
 
 
 
@@ -411,34 +350,10 @@ class Decoder(nn.Module):
             for i in range(batch_size):
                 goals_2D = mapping[i]['goals_2D']
 
-                self.goals_2D_per_example(i, goals_2D, mapping, lane_states_batch, inputs, inputs_lengths,
+                scores, goals_2D, offsets = self.goals_2D_per_example(i, goals_2D, mapping, lane_states_batch, inputs, inputs_lengths,
                                           hidden_states, labels, labels_is_valid, device, loss, DE)
 
-            if 'set_predict' in args.other_params:
-                pass
-                # if args.do_eval:
-                #     pred_trajs_batch = np.zeros([batch_size, 6, self.future_frame_num, 2])
-                #     for i in range(batch_size):
-                #         if 'set_predict_trajs' in mapping[i]:
-                #             pred_trajs_batch[i] = mapping[i]['set_predict_trajs']
-                #             for each in pred_trajs_batch[i]:
-                #                 utils.to_origin_coordinate(each, i)
-                #     return pred_trajs_batch
-
-            if args.do_eval:
-                return self.goals_2D_eval(batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device)
-            else:
-                if args.visualize:
-                    for i in range(batch_size):
-                        predict = np.zeros((self.mode_num, self.future_frame_num, 2))
-                        utils.visualize_goals_2D(mapping[i], mapping[i]['vis.goals_2D'], mapping[i]['vis.scores'],
-                                                 self.future_frame_num,
-                                                 labels=mapping[i]['vis.labels'],
-                                                 labels_is_valid=mapping[i]['vis.labels_is_valid'],
-                                                 predict=predict)
-                return loss.mean(), DE, None
-        else:
-            assert False
+        return scores, goals_2D, offsets
 
     def get_scores(self, goals_2D_tensor: Tensor, inputs, hidden_states, inputs_lengths, i, mapping, device, get_offsets = False):
         """
