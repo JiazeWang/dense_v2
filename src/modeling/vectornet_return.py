@@ -174,5 +174,5 @@ class VectorNet(nn.Module):
 
         utils.logging('time3', round(time.time() - starttime, 2), 'secs')
         scores, goals_2D, offsets = self.decoder(mapping, batch_size, lane_states_batch, inputs, inputs_lengths, hidden_states, device)
-        print(scores.shape, goals_2D.shape, offsets.shape)
+        print(scores.shape, len(goals_2D), offsets.shape)
         return error
