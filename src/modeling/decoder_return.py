@@ -250,12 +250,14 @@ class Decoder(nn.Module):
                                                       get_scores_inputs, stage_one_topk_ids, gt_points)
         #get input
         goals_2D = torch.tensor(goals_2D, dtype=torch.float, device=device)
-        _, topk_ids = torch.topk(scores, 1000)
+        _, topk_ids = torch.topk(scores, k=min(1000, len(scores)))
         topk_ids = topk_ids.cpu().numpy()
         scores = scores.reshape(-1, 1)
         tensor = torch.cat([goals_2D, scores, offsets], dim = 1)[topk_ids]
+        input_tensor = torch.zeros([1000, 5], device=device)
+        input_tensor[0:len(scores), :] = tensor
         #print("tensor.shape:", tensor.shape)
-        tensor_encode = self.feature_encoder(tensor).reshape(1000)
+        tensor_encode = self.feature_encoder(input_tensor).reshape(1000)
         tensor_decoder = self.feature_decoder(tensor_encode).reshape(6, 3)
         final_idx = mapping[i].get('final_idx', -1)
         gt_goal = gt_points[final_idx]
