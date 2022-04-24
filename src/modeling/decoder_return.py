@@ -162,10 +162,10 @@ class Decoder(nn.Module):
             label = np.array(labels[i]).reshape([self.future_frame_num, 2])
             final_idx = mapping[i].get('final_idx', -1)
             mapping[i]['goals_2D_labels'] = np.argmin(utils.get_dis(goals_2D, label[final_idx]))
-        print("scores.shape:", scores.shape)
-        print("point.shape:", point.shape)
-        print("goals_2D.shape:", goals_2D.shape)
-        print(error)
+        #print("scores.shape:", scores.shape)
+        #print("point.shape:", point.shape)
+        #print("goals_2D.shape:", goals_2D.shape)
+        #print(error)
         return scores, point, goals_2D, offsets
 
     def goals_2D_per_example_calc_loss(self, i: int, goals_2D: np.ndarray, mapping: List[Dict], inputs: Tensor,
