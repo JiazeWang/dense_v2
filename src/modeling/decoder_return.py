@@ -264,10 +264,10 @@ class Decoder(nn.Module):
         index = torch.argmin(distance)
         final_point = tensor_decoder[index][1:]
         final_point_gt = torch.tensor(goals_2D, dtype=torch.float, device=device)
-        print(scores.shape, final_point_gt.shape)
-        loss[i] += F.smooth_l1_loss(scores.unsqueeze(0), final_point_gt)
+        print("scores.shape, final_point_gt.shape",scores.shape, final_point_gt.shape)
+        loss[i] += F.smooth_l1_loss(scores, final_point_gt)
         final_scores = tensor_decoder[:, 0]
-        print(final_scores.shape, index.shape)
+        print("final_scores.shape, index.shape", final_scores.shape, index.shape)
         loss[i] += F.nll_loss(final_scores, index)
         print("loss[i]:", loss[i])
         return scores, goals_2D, offsets
