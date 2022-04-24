@@ -281,8 +281,8 @@ class Decoder(nn.Module):
             if distance<=100:
                 goals_new.append(goals_2D[i])
                 scores_new.append(scores[i])
-        goals_new = np.concatenate(goals_new, axis=0)
-        scores_new = np.concatenate(scores_new, axis=0)
+        goals_new = np.stack(goals_new, axis=0)
+        scores_new = np.stack(scores_new, axis=0)
         print("goals_new.shape", goals_new.shape, "goals_2D.shape", goals_2D.shape)
 
         return goals_new, scores_new
