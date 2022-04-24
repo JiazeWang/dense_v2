@@ -212,6 +212,7 @@ class Decoder(nn.Module):
         loss[i] += F.nll_loss(scores.unsqueeze(0),
                               torch.tensor([mapping[i]['goals_2D_labels']], device=device))
 
+
     def goals_2D_per_example(self, i: int, goals_2D: np.ndarray, mapping: List[Dict], lane_states_batch: List[Tensor],
                              inputs: Tensor, inputs_lengths: List[int], hidden_states: Tensor, labels: List[np.ndarray],
                              labels_is_valid: List[np.ndarray], device, loss: Tensor, DE: np.ndarray):
@@ -261,7 +262,7 @@ class Decoder(nn.Module):
         distance = np.zeros([6])
         for i in  range(0, 6):
             distance[i] = np.sqrt((tensor_decoder[i][1].detach().cpu().numpy() - gt_points[final_idx][0]) ** 2 + (tensor_decoder[i][2].detach().cpu().numpy() - gt_points[final_idx][1]) ** 2)
-        index = torch.argmin(distance)
+        index = np.argmin(distance)
         final_point = tensor_decoder[index][1:]
         final_point_gt = torch.tensor(goals_2D, dtype=torch.float, device=device)
         print("scores.shape, final_point_gt.shape",scores.shape, final_point_gt.shape)
