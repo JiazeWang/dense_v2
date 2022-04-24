@@ -523,7 +523,7 @@ class Decoder(nn.Module):
                 validity = self.set_dis(input)
                 validity = F.softmax(validity, dim = -1)
                 validity_gt = torch.tensor([0, 1], device = device)
-                print("validity:", validity)
+                #print("validity:", validity)
                 #print("validity_gt.shape", validity_gt)
                 if i%2 == 0:
                     loss[i] += F.cross_entropy(validity, validity_gt)
