@@ -269,10 +269,9 @@ class Decoder(nn.Module):
             else:
                 scores_new[i] = 1 - torch.sqrt(distance[i]) / 2
 
-
         index = np.argmin(distance)
         final_point = tensor_decoder[index][1:]
-        final_point_gt = torch.tensor(goals_2D, dtype=torch.float, device=device)
+        final_point_gt = torch.tensor(gt_goal, dtype=torch.float, device=device)
         print("final_point.shape, final_point_gt.shape",final_point.shape, final_point_gt.shape)
         loss[i] += F.smooth_l1_loss(final_point, final_point_gt)
         final_scores = tensor_decoder[:, 0]
