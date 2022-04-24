@@ -308,7 +308,80 @@ class Decoder(nn.Module):
         :param hidden_states: hidden states of all elements after encoding by global graph (shape [batch_size, -1, hidden_size])
         :param inputs: hidden states of all elements before encoding by global graph (shape [batch_size, 'element num', hidden_size])
         :param inputs_lengths: valid element number of each example
-        :param DE: displacement error (shape [batch_size, self.fu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    utils.visualize_goals_2D(mapping[i], mapping[i]['vis.goals_2D'], mapping[i]['vis.scores'],
+        :param DE: displacement error (shape [batch_size, self.future_frame_num])
+        """
+        outputs = self.variety_loss_decoder(hidden_states[:, 0, :])
+        pred_probs = None
+        if 'variety_loss-prob' in args.other_params:
+            pred_probs = F.log_softmax(outputs[:, -6:], dim=-1)
+            outputs = outputs[:, :-6].view([batch_size, 6, self.future_frame_num, 2])
+        else:
+            outputs = outputs.view([batch_size, 6, self.future_frame_num, 2])
+
+        for i in range(batch_size):
+            if args.do_train:
+                assert labels_is_valid[i][-1]
+            gt_points = np.array(labels[i]).reshape([self.future_frame_num, 2])
+            argmin = np.argmin(utils.get_dis_point_2_points(gt_points[-1], np.array(outputs[i, :, -1, :].tolist())))
+
+            loss_ = F.smooth_l1_loss(outputs[i, argmin],
+                                     torch.tensor(gt_points, device=device, dtype=torch.float), reduction='none')
+            loss_ = loss_ * torch.tensor(labels_is_valid[i], device=device, dtype=torch.float).view(self.future_frame_num, 1)
+            if labels_is_valid[i].sum() > utils.eps:
+                loss[i] += loss_.sum() / labels_is_valid[i].sum()
+
+            if 'variety_loss-prob' in args.other_params:
+                loss[i] += F.nll_loss(pred_probs[i].unsqueeze(0), torch.tensor([argmin], device=device))
+        if args.do_eval:
+            outputs = np.array(outputs.tolist())
+            pred_probs = np.array(pred_probs.tolist(), dtype=np.float32) if pred_probs is not None else pred_probs
+            for i in range(batch_size):
+                for each in outputs[i]:
+                    utils.to_origin_coordinate(each, i)
+
+            return outputs, pred_probs, None
+        return loss.mean(), DE, None
+
+    def forward(self, mapping: List[Dict], batch_size, lane_states_batch: List[Tensor], inputs: Tensor,
+                inputs_lengths: List[int], hidden_states: Tensor, device):
+        """
+        :param lane_states_batch: each value in list is hidden states of lanes (value shape ['lane num', hidden_size])
+        :param inputs: hidden states of all elements before encoding by global graph (shape [batch_size, 'element num', hidden_size])
+        :param inputs_lengths: valid element number of each example
+        :param hidden_states: hidden states of all elements after encoding by global graph (shape [batch_size, 'element num', hidden_size])
+        """
+        labels = utils.get_from_mapping(mapping, 'labels')
+        labels_is_valid = utils.get_from_mapping(mapping, 'labels_is_valid')
+        loss = torch.zeros(batch_size, device=device)
+        DE = np.zeros([batch_size, self.future_frame_num])
+
+        if 'variety_loss' in args.other_params:
+            return self.variety_loss(mapping, hidden_states, batch_size, inputs, inputs_lengths, labels_is_valid, loss, DE, device, labels)
+        elif 'goals_2D' in args.other_params:
+            for i in range(batch_size):
+                goals_2D = mapping[i]['goals_2D']
+
+                self.goals_2D_per_example(i, goals_2D, mapping, lane_states_batch, inputs, inputs_lengths,
+                                          hidden_states, labels, labels_is_valid, device, loss, DE)
+
+            if 'set_predict' in args.other_params:
+                pass
+                # if args.do_eval:
+                #     pred_trajs_batch = np.zeros([batch_size, 6, self.future_frame_num, 2])
+                #     for i in range(batch_size):
+                #         if 'set_predict_trajs' in mapping[i]:
+                #             pred_trajs_batch[i] = mapping[i]['set_predict_trajs']
+                #             for each in pred_trajs_batch[i]:
+                #                 utils.to_origin_coordinate(each, i)
+                #     return pred_trajs_batch
+
+            if args.do_eval:
+                return self.goals_2D_eval(batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device)
+            else:
+                if args.visualize:
+                    for i in range(batch_size):
+                        predict = np.zeros((self.mode_num, self.future_frame_num, 2))
+                        utils.visualize_goals_2D(mapping[i], mapping[i]['vis.goals_2D'], mapping[i]['vis.scores'],
                                                  self.future_frame_num,
                                                  labels=mapping[i]['vis.labels'],
                                                  labels_is_valid=mapping[i]['vis.labels_is_valid'],

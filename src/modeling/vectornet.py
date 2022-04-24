@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch import nn, Tensor
 
 #from modeling.decoder_origin import Decoder, DecoderResCat
-from modeling.decoder_gan import Decoder, DecoderResCat
+from modeling.decoder_new import Decoder, DecoderResCat
 #from modeling.decoder import Decoder, DecoderResCat
 #from modeling.decoder_refine_target import Decoder, DecoderResCat
 #from modeling.decoder_voting import Decoder, DecoderResCat
