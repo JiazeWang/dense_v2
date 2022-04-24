@@ -222,7 +222,7 @@ def demo_basic(rank, world_size, kwargs, queue):
         model = DDP(model, device_ids=[rank], find_unused_parameters=True)
     else:
         model = VectorNet(args).to(rank)
-
+    """
     if 'set_predict' in args.other_params:
         optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.learning_rate)
     elif 'complete_traj-3' in args.other_params:
@@ -234,7 +234,10 @@ def demo_basic(rank, world_size, kwargs, queue):
             lr=args.learning_rate)
     else:
         optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
-
+    """
+    optimizer = torch.optim.Adam(
+        [each[1] for each in model.named_parameters() if str(each[0]).startswith('module.decoder.feature')],
+        lr=args.learning_rate)
     if rank == 0 and world_size > 0:
         receive = queue.get()
         assert receive == True
