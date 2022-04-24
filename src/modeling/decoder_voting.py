@@ -259,7 +259,7 @@ class Decoder(nn.Module):
                     utils.select_goals_by_NMS(mapping[i], goals_2D, np.array(scores.tolist()), args.nms_threshold, mapping[i]['speed'])
                 elif 'optimization' in args.other_params:
                     #print("goals_2D.shape:", goals_2D.shape)
-                    print("offsets.shape:", offsets)
+                    #print("offsets.shape:", offsets)
                     goals_2D = goals_2D + offsets.detach().cpu().numpy()
                     #print("new.shape:", goals_2D.shape)
                     mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores.tolist(), dtype=np.float32)
