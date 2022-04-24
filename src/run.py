@@ -30,7 +30,8 @@ def compile_pyx_files():
 compile_pyx_files()
 
 import utils, structs
-from modeling.vectornet_return import VectorNet
+#from modeling.vectornet_return import VectorNet
+from modeling.vectornet import VectorNet
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
