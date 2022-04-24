@@ -458,7 +458,7 @@ class Decoder(nn.Module):
                     topk_num = torch.sum(scores > np.log(0.00001)).item()
 
                 _, topk_ids = torch.topk(scores, k=min(topk_num, len(scores)))
-                goals_2D = goals_2D[topk_ids.cpu().numpy()]
+                goals_2D = goals_2D[topk_ids.detach().cpu().numpy()]
                 scores = scores[topk_ids]
 
         scores_positive_np = np.exp(np.array(scores.tolist(), dtype=np.float32))
