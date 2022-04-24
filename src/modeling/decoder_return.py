@@ -92,17 +92,17 @@ class Decoder(nn.Module):
             self.set_predict_decoders = nn.ModuleList(
                 [DecoderResCat(hidden_size, hidden_size * 2, out_features=13) for _ in range(args.other_params['set_predict'])])
 
-            self.feature_encoder = nn.Sequential(
-                MLP(5, hidden_size),
-                MLP(hidden_size),
-                MLP(hidden_size, 1)
-            )
+        self.feature_encoder = nn.Sequential(
+            MLP(5, hidden_size),
+            MLP(hidden_size),
+            MLP(hidden_size, 1)
+        )
 
-            self.feature_decoder = nn.Sequential(
-                MLP(1000, hidden_size),
-                MLP(hidden_size),
-                MLP(hidden_size, 12)
-            )
+        self.feature_decoder = nn.Sequential(
+            MLP(1000, hidden_size),
+            MLP(hidden_size),
+            MLP(hidden_size, 12)
+        )
 
 
     def goals_2D_per_example_stage_one(self, i, mapping, lane_states_batch, inputs, inputs_lengths,
