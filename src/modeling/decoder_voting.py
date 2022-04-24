@@ -283,7 +283,7 @@ class Decoder(nn.Module):
             if distance<=4:
                 goals_new.append(goals_2D[i])
                 scores_new.append(scores[i])
-            if distance<=16:
+            if distance<=100:
                 goals_new_16.append(goals_2D[i])
                 scores_new_16.append(scores[i])
 
