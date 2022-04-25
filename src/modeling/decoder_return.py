@@ -259,6 +259,7 @@ class Decoder(nn.Module):
         #print("tensor.shape:", tensor.shape)
         tensor_encode = self.feature_encoder(input_tensor).reshape(1000)
         tensor_decoder = self.feature_decoder(tensor_encode).reshape(6, 3)
+
         final_idx = mapping[i].get('final_idx', -1)
         gt_goal = gt_points[final_idx]
         distance = np.zeros([6])
@@ -284,23 +285,16 @@ class Decoder(nn.Module):
         loss[i] += F.binary_cross_entropy(final_scores, scores_new)
         #print("loss[i]:", loss[i])
         #return scores, goals_2D, offsets
+        return tensor_decoder
 
 
 
 
-
-    def goals_2D_eval(self, batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device):
-        if 'set_predict' in args.other_params:
-            pred_goals_batch = [mapping[i]['set_predict_ans_points'] for i in range(batch_size)]
-            pred_probs_batch = np.zeros((batch_size, 6))
-        elif 'optimization' in args.other_params:
-            pred_goals_batch, pred_probs_batch = utils.select_goals_by_optimization(
-                np.array(labels).reshape([batch_size, self.future_frame_num, 2]), mapping)
-        elif args.nms_threshold is not None:
-            pred_goals_batch = [mapping[i]['pred_goals'] for i in range(batch_size)]
-            pred_probs_batch = [mapping[i]['pred_probs'] for i in range(batch_size)]
-        else:
-            assert False
+    def goals_2D_eval(self, batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device, tensor_decoder):
+        pred_probs_batch = tensor_decoder_feature[:, 0]
+        pred_goals_batch = tensor_decoder_feature[:, 1:3]
+        print("pred_probs_batch.shape:", pred_probs_batch.shape)
+        print("pred_goals_batch.shape:", pred_goals_batch.shape)
 
         pred_goals_batch = np.array(pred_goals_batch)
         pred_probs_batch = np.array(pred_probs_batch)
@@ -390,15 +384,18 @@ class Decoder(nn.Module):
         labels_is_valid = utils.get_from_mapping(mapping, 'labels_is_valid')
         loss = torch.zeros(batch_size, device=device)
         DE = np.zeros([batch_size, self.future_frame_num])
-
+        tensor_decoder_feature = torch.zeors([batch_size, 6, 3])
         if 'variety_loss' in args.other_params:
             return self.variety_loss(mapping, hidden_states, batch_size, inputs, inputs_lengths, labels_is_valid, loss, DE, device, labels)
         elif 'goals_2D' in args.other_params:
             for i in range(batch_size):
                 goals_2D = mapping[i]['goals_2D']
 
-                self.goals_2D_per_example(i, goals_2D, mapping, lane_states_batch, inputs, inputs_lengths,
+                tensor_decoder_feature[i] = self.goals_2D_per_example(i, goals_2D, mapping, lane_states_batch, inputs, inputs_lengths,
                                           hidden_states, labels, labels_is_valid, device, loss, DE)
+
+        if args.do_eval:
+            return self.goals_2D_eval(batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device, tensor_decoder_feature)
 
         return loss.mean(), DE, None
 
