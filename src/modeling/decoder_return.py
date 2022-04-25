@@ -293,8 +293,8 @@ class Decoder(nn.Module):
     def goals_2D_eval(self, batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device, tensor_decoder_feature):
         pred_probs_batch = tensor_decoder_feature[:, :, 0].detach().numpy()
         pred_goals_batch = tensor_decoder_feature[:, :, 1:3].detach().numpy()
-        print("pred_probs_batch.shape:", pred_probs_batch.shape)
-        print("pred_goals_batch.shape:", pred_goals_batch.shape)
+        print("pred_probs_batch.shape:", pred_probs_batch)
+        print("pred_goals_batch.shape:", pred_goals_batch)
 
         pred_goals_batch = np.array(pred_goals_batch)
         pred_probs_batch = np.array(pred_probs_batch)
