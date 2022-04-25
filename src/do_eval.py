@@ -10,8 +10,8 @@ from tqdm import tqdm
 
 import structs
 import utils
-from modeling.vectornet_return import VectorNet
-
+#from modeling.vectornet_return import VectorNet
+from modeling.vectornet import VectorNet
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.INFO)
