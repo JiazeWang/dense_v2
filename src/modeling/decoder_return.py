@@ -384,7 +384,7 @@ class Decoder(nn.Module):
         labels_is_valid = utils.get_from_mapping(mapping, 'labels_is_valid')
         loss = torch.zeros(batch_size, device=device)
         DE = np.zeros([batch_size, self.future_frame_num])
-        tensor_decoder_feature = torch.zeors([batch_size, 6, 3])
+        tensor_decoder_feature = torch.zeros([batch_size, 6, 3])
         if 'variety_loss' in args.other_params:
             return self.variety_loss(mapping, hidden_states, batch_size, inputs, inputs_lengths, labels_is_valid, loss, DE, device, labels)
         elif 'goals_2D' in args.other_params:
