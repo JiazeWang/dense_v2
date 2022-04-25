@@ -1230,7 +1230,7 @@ def get_neighbour_points(points, topk_ids=None, mapping=None, neighbour_dis=2):
     points = list(grid.keys())
     return points
 
-
+"""
 def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_dis=2):
     # grid = np.zeros([300, 300], dtype=int)
     grid = {}
@@ -1259,11 +1259,12 @@ def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_di
         for i in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
             for j in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
                 points_new.append([x + i/granularity, y+j/granularity])
+                print(x, y, x + i/granularity, y+j/granularity)
                 #grid[(x + i, y + j))] = 1
     #points = list(grid.keys())
     return points_new
 
-"""
+
 def get_neighbour_points_new(points, neighbour_dis=2, density=1.0):
     grid = {}
 
