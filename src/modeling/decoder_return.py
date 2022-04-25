@@ -290,7 +290,7 @@ class Decoder(nn.Module):
 
 
 
-    def goals_2D_eval(self, batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device, tensor_decoder):
+    def goals_2D_eval(self, batch_size, mapping, labels, hidden_states, inputs, inputs_lengths, device, tensor_decoder_feature):
         pred_probs_batch = tensor_decoder_feature[:, 0]
         pred_goals_batch = tensor_decoder_feature[:, 1:3]
         print("pred_probs_batch.shape:", pred_probs_batch.shape)
