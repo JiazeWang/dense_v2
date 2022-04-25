@@ -1237,7 +1237,7 @@ def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_di
     num = len(points)
     for fake_idx, point in enumerate(points):
         x, y = round(float(point[0])), round(float(point[1]))
-        granularity = 5 - np.floor(4 * fake_idx/num)
+        granularity = int(5 - np.floor(4 * fake_idx/num))
         # not compatible argo
         for i in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
             for j in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
