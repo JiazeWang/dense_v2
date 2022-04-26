@@ -92,7 +92,10 @@ def do_eval(args):
             assert pred_trajectory[i].shape == (6, args.future_frame_num, 2)
             assert pred_score[i].shape == (6,)
             argo_pred[mapping[i]['file_name']] = structs.MultiScoredTrajectory(pred_score[i].copy(), pred_trajectory[i].copy())
-            print(argo_pred[mapping[i]['file_name']][0], " result: ", argo_pred[mapping[i]['file_name']][1].shape)
+            score = argo_pred[mapping[i]['file_name']][0]
+            traj = argo_pred[mapping[i]['file_name']][1]
+            score = np.exp(score)/sum(np.exp(score))
+            print("score:",score)
             output_all[int(mapping[i]['file_name'].split('/')[-1][:-4])] = argo_pred[mapping[i]['file_name']][1]
         if args.argoverse:
             eval_instance_argoverse(batch_size, args, pred_trajectory, mapping, file2pred, file2labels, DEs, iter_bar)
