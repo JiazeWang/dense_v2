@@ -95,7 +95,7 @@ def do_eval(args):
             score = argo_pred[mapping[i]['file_name']][0]
             traj = argo_pred[mapping[i]['file_name']][1]
             score = np.exp(score)/sum(np.exp(score)).tolist()
-            print("score:", score)
+            #print("score:", score)
             output_all[int(mapping[i]['file_name'].split('/')[-1][:-4])] = traj
             probablity[int(mapping[i]['file_name'].split('/')[-1][:-4])] = score
         if args.argoverse:
