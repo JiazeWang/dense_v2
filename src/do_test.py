@@ -94,9 +94,10 @@ def do_eval(args):
             argo_pred[mapping[i]['file_name']] = structs.MultiScoredTrajectory(pred_score[i].copy(), pred_trajectory[i].copy())
             score = argo_pred[mapping[i]['file_name']][0]
             traj = argo_pred[mapping[i]['file_name']][1]
-            score = np.exp(score)/sum(np.exp(score))
-            print("score:",score)
-            output_all[int(mapping[i]['file_name'].split('/')[-1][:-4])] = argo_pred[mapping[i]['file_name']][1]
+            score = np.exp(score)/sum(np.exp(score)).tolist()
+            print("score:", score)
+            output_all[int(mapping[i]['file_name'].split('/')[-1][:-4])] = traj
+            probablity[int(mapping[i]['file_name'].split('/')[-1][:-4])] = score
         if args.argoverse:
             eval_instance_argoverse(batch_size, args, pred_trajectory, mapping, file2pred, file2labels, DEs, iter_bar)
     if 'optimization' in args.other_params:
@@ -106,7 +107,7 @@ def do_eval(args):
     from argoverse.evaluation.competition_util import generate_forecasting_h5
     output_path = 'competition_files_fde/'
     #print("output_all:", output_all)
-    generate_forecasting_h5(output_all, output_path) #this might take awhile
+    generate_forecasting_h5(output_all, output_path, "mr", probablity) #this might take awhile
     print("generating h5 files finished!!!")
 
     """
