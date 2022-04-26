@@ -1242,7 +1242,7 @@ def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_di
             for j in range((-neighbour_dis)*4, (neighbour_dis + 1)*4):
                 grid[(x + (i / 4), y + (j / 4))] = 1
     points = list(grid.keys())
-    return points_new
+    return points
 """
 
 def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_dis=2):
