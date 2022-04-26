@@ -143,7 +143,8 @@ class Decoder(nn.Module):
 
         goals_2D_new = utils.get_neighbour_points_dense(goals_2D[topk_ids], topk_ids=topk_ids, mapping=mapping[i])
         #print("goals_2D_new[0]:", goals_2D_new[0])
-        #print("len(goals_2D_new):", len(goals_2D_new))
+        print("len(goals_2D_new):", len(goals_2D_new))
+        assert len(goals_2D_new)
         goals_2D_new = torch.cat([torch.tensor(goals_2D_new, device=device, dtype=torch.float),
                                   torch.tensor(goals_2D, device=device, dtype=torch.float)], dim=0)
 
