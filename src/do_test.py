@@ -107,7 +107,7 @@ def do_eval(args):
     from argoverse.evaluation.competition_util import generate_forecasting_h5
     output_path = 'competition_files_fde/'
     #print("output_all:", output_all)
-    generate_forecasting_h5(output_all, output_path, "fde", probablity) #this might take awhile
+    generate_forecasting_h5(output_all, output_path, "fde_20", probablity) #this might take awhile
     print("generating h5 files finished!!!")
 
     """
