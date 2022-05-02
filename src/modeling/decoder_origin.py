@@ -154,7 +154,7 @@ class Decoder(nn.Module):
         # print('len', len(goals_2D))
 
         scores = self.get_scores(goals_2D_new, *get_scores_inputs)
-        print("scores:", scores)print("scores:", scores)
+        print("scores:", scores)
 
         index = torch.argmax(scores).item()
         point = np.array(goals_2D_new[index].tolist())
