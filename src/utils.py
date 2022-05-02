@@ -1234,7 +1234,6 @@ def get_neighbour_points(points, topk_ids=None, mapping=None, neighbour_dis=2):
 def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_dis=2):
     # grid = np.zeros([300, 300], dtype=int)
     grid = {}
-    points_new = []
     for fake_idx, point in enumerate(points):
         x, y = round(float(point[0])), round(float(point[1]))
         # not compatible argo
