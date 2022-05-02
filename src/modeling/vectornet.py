@@ -138,10 +138,11 @@ class VectorNet(nn.Module):
                 if 'laneGCN-4' in args.other_params:
                     lanes = lanes + self.laneGCN_A2L(lanes.unsqueeze(0), torch.cat([lanes, agents[0:1]]).unsqueeze(0)).squeeze(0)
                 else:
+                    lanes_origin = lanes
                     lanes = lanes + self.laneGCN_A2L(lanes.unsqueeze(0), torch.cat([lanes, agents[0:1]]).unsqueeze(0)).squeeze(0)
                     #lanes = lanes + self.laneGCN_A2L(lanes.unsqueeze(0), agents.unsqueeze(0)).squeeze(0)
                     #lanes = lanes + self.laneGCN_L2L(lanes.unsqueeze(0)).squeeze(0)
-                    agents = agents + self.laneGCN_L2A(agents.unsqueeze(0), lanes.unsqueeze(0)).squeeze(0)
+                    lanes = lanes_origin + self.laneGCN_A2L(torch.cat([lanes_origin, agents[0:1]], lanes_origin.unsqueeze(0)).unsqueeze(0)).squeeze(0)
                 element_states_batch[i] = torch.cat([agents, lanes])
 
         return element_states_batch, lane_states_batch
