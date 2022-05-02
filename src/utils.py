@@ -1356,7 +1356,7 @@ def run_process(queue, queue_res, args):
             break
         idx_in_batch, file_name, (goals_2D, scores), kwargs = value
         scores = np.exp(scores)
-        print("scoresnew:", scores, scores.max(), scores.min())
+        #print("scoresnew:", scores, scores.max(), scores.min())
         if file_name == 'test_obs/data/33670.csv':
             print('aaa', len(scores), np.sum(scores), scores, goals_2D)
 
