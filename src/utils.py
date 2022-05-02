@@ -1423,7 +1423,7 @@ def select_goals_by_optimization(batch_gt_points, mapping, close=False):
         for i in range(batch_size):
             kwargs = {}
             pass
-
+            print("max:", mapping[i]['goals_2D_scores'].max(), "min", mapping[i]['goals_2D_scores'].min())
             queue.put((i, batch_file_name[i], mapping[i]['goals_2D_scores'], kwargs))
 
     while not queue.empty():
