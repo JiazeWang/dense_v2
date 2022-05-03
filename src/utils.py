@@ -1242,12 +1242,12 @@ def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_di
                 grid[(x + (i / 4), y + (j / 4))] = 1
     points = list(grid.keys())
     return points
-"""
 
-def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_dis=2):
+
+def get_neighbour_points_dynamic(points, topk_ids=None, mapping=None, neighbour_dis=2):
     # grid = np.zeros([300, 300], dtype=int)
     grid = {}
-    points_new = []
+    #points_new = []
     num = len(points)
     for fake_idx, point in enumerate(points):
         x, y = round(float(point[0])), round(float(point[1]))
@@ -1256,12 +1256,10 @@ def get_neighbour_points_dense(points, topk_ids=None, mapping=None, neighbour_di
         # not compatible argo
         for i in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
             for j in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
-                points_new.append([x + i/granularity, y+j/granularity])
-                print(x, y, x + i/granularity, y+j/granularity)
-                #grid[(x + i, y + j))] = 1
-    #points = list(grid.keys())
-    return points_new
-"""
+                grid[(x + i/granularity, y+j/granularity))] = 1
+    points = list(grid.keys())
+    return points
+
 
 def get_neighbour_points_new(points, topk_ids=None, mapping=None, neighbour_dis=2, density=0.25):
     grid = {}
