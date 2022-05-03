@@ -188,8 +188,8 @@ def _get_optimal_targets(np.ndarray[np.float32_t, ndim=2] goals_2D, np.ndarray[n
     m = 0
     #threshold = 0.001
     #threshold = 0.00003
-    threshold = 0.00005
-    #threshold = 0.00007
+    #threshold = 0.00005
+    threshold = 0.00007
     #threshold = 0.00010
     cdef np.ndarray[np.float32_t, ndim=2] ans_points = np.zeros((6, 2), dtype=np.float32)
     cdef np.ndarray[np.float32_t, ndim=2] nxt_points = np.zeros((6, 2), dtype=np.float32)
