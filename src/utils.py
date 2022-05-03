@@ -1256,7 +1256,7 @@ def get_neighbour_points_dynamic(points, topk_ids=None, mapping=None, neighbour_
         # not compatible argo
         for i in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
             for j in range(-neighbour_dis * granularity, (neighbour_dis + 1)* granularity):
-                grid[(x + i/granularity, y+j/granularity))] = 1
+                grid[(x + i/granularity, y+j/granularity)] = 1
     points = list(grid.keys())
     return points
 
