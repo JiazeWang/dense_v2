@@ -70,7 +70,10 @@ class Decoder(nn.Module):
             self.stage_one_decoder = DecoderResCat(hidden_size, hidden_size * 3, out_features=1)
             self.stage_one_goals_2D_decoder = DecoderResCat(hidden_size, hidden_size * 4, out_features=1)
             #2D
-        self.offsets_2D_decoder = DecoderResCat(hidden_size, hidden_size * 4, out_features=2)
+        self.offsets_2D_decoder = nn.Sequential(
+                DecoderResCat(hidden_size, hidden_size * 4, out_features=2),
+                nn.Tanh()
+            )
 
         if 'set_predict' in args.other_params:
             if args.do_train:
@@ -474,7 +477,7 @@ class Decoder(nn.Module):
             #print("Calculating the offsets")
             #print("li.shape:", torch.cat(li, dim=-1).shape)
             offsets = self.offsets_2D_decoder(torch.cat(li, dim=-1))
-            #print("offsets.shape:", offsets.shape)
+            print("offsets[0]:", offsets[0])
             #print(TestEnd)
             return scores, offsets
 
