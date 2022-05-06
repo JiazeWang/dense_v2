@@ -186,11 +186,11 @@ def _get_optimal_targets(np.ndarray[np.float32_t, ndim=2] goals_2D, np.ndarray[n
     cdef int i, j, n, m, t_int, step, op, ok, go
     n = goals_2D.shape[0]
     m = 0
-    #threshold = 0.001
+    threshold = 0.001
     #threshold = 0.00004
     #threshold = 0.00005
     #threshold = 0.00006
-    threshold = 0.00007
+    #threshold = 0.00007
     cdef np.ndarray[np.float32_t, ndim=2] ans_points = np.zeros((6, 2), dtype=np.float32)
     cdef np.ndarray[np.float32_t, ndim=2] nxt_points = np.zeros((6, 2), dtype=np.float32)
     cdef np.ndarray[np.float32_t, ndim=1] pred_probs = np.zeros(6, dtype=np.float32)
