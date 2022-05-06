@@ -314,7 +314,7 @@ class Decoder(nn.Module):
             for i in range(batch_size):
                 get_scores_inputs = (inputs, hidden_states, inputs_lengths, i, mapping, device)
                 scores, offsets = self.get_scores(torch.tensor(pred_goals_batch[i], device=device, dtype=torch.float), *get_scores_inputs, get_offsets = True)
-                print("offsets.shape:", offsets.shape)
+                #print("offsets.shape:", offsets.shape)
                 pred_goals_batch[i] = pred_goals_batch[i] + offsets.detach().cpu().numpy()
 
         elif args.nms_threshold is not None:
