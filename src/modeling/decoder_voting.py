@@ -263,15 +263,17 @@ class Decoder(nn.Module):
                 elif 'optimization' in args.other_params:
                     #print("goals_2D.shape:", goals_2D.shape)
                     #print("offsets.shape:", offsets)
-                    """
+
                     goals_2D = goals_2D + offsets.detach().cpu().numpy()
                     #print("new.shape:", goals_2D.shape)\
+                    scores_new, offsets = self.get_scores(goals_2D, *get_scores_inputs, get_offsets = True)
 
-                    mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores.tolist(), dtype=np.float32)
+                    mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores_new.tolist(), dtype=np.float32)
                     """
                     goal_2D_new, scores_new = self.get_new_goals(goals_2D, offsets.detach().cpu().numpy(), scores.detach().cpu().numpy())
                     mapping[i]['goals_2D_scores'] = goal_2D_new.astype(np.float32), np.array(scores_new.tolist(), dtype=np.float32)
                     #print("mapping[i]:", mapping[i]['goals_2D_scores'][0].shape, mapping[i]['goals_2D_scores'][1].shape)
+                    """
                 else:
                     assert False
 
