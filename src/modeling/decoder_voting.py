@@ -263,8 +263,11 @@ class Decoder(nn.Module):
                 elif 'optimization' in args.other_params:
                     #print("goals_2D.shape:", goals_2D.shape)
                     #print("offsets.shape:", offsets)
+                    """
                     mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores.tolist(), dtype=np.float32)
 
+
+                    """
                     """
                     goals_2D = goals_2D + offsets.detach().cpu().numpy()
                     #print("new.shape:", goals_2D.shape)\
@@ -272,12 +275,12 @@ class Decoder(nn.Module):
                     scores_new, offsets = self.get_scores(goals_2D_tensor, *get_scores_inputs, get_offsets = True)
 
                     mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores_new.tolist(), dtype=np.float32)
-                    """
+
                     """
                     goal_2D_new, scores_new = self.get_new_goals(goals_2D, offsets.detach().cpu().numpy(), scores.detach().cpu().numpy())
                     mapping[i]['goals_2D_scores'] = goal_2D_new.astype(np.float32), np.array(scores_new.tolist(), dtype=np.float32)
                     #print("mapping[i]:", mapping[i]['goals_2D_scores'][0].shape, mapping[i]['goals_2D_scores'][1].shape)
-                    """
+
                 else:
                     assert False
 
@@ -289,22 +292,10 @@ class Decoder(nn.Module):
         for i in range(0, goals_2D.shape[0]):
             distance = offsets[i][0]*offsets[i][0]+offsets[i][1]*offsets[i][1]
             #print(distance)
-            if distance<=4:
-                goals_new.append(goals_2D[i])
-                scores_new.append(scores[i])
-            if distance<=100:
-                goals_new_16.append(goals_2D[i])
-                scores_new_16.append(scores[i])
-
-        if len(goals_new) >=6:
-            goals_return = np.stack(goals_new, axis=0)
-            scores_return = np.stack(scores_new, axis=0)
-        elif len(scores_new_16)>=6:
-            goals_return = np.stack(goals_new_16, axis=0)
-            scores_return = np.stack(scores_new_16, axis=0)
-        else:
-            goals_return = goals_2D
-            scores_return = scores
+            goals_new.append(goals_2D[i])
+            scores_new.append(-distance)
+        goals_return = np.stack(goals_new, axis=0)
+        scores_return = np.stack(scores_new, axis=0)
         #print("goals_new.shape", goals_new.shape, "goals_2D.shape", goals_2D.shape)
 
         return goals_return, scores_return
