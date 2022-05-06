@@ -266,7 +266,8 @@ class Decoder(nn.Module):
 
                     goals_2D = goals_2D + offsets.detach().cpu().numpy()
                     #print("new.shape:", goals_2D.shape)\
-                    scores_new, offsets = self.get_scores(goals_2D, *get_scores_inputs, get_offsets = True)
+                    goals_2D_tensor = torch.tensor(goals_2D, device=device, dtype=torch.float)
+                    scores_new, offsets = self.get_scores(goals_2D_tensor, *get_scores_inputs, get_offsets = True)
 
                     mapping[i]['goals_2D_scores'] = goals_2D.astype(np.float32), np.array(scores_new.tolist(), dtype=np.float32)
                     """
