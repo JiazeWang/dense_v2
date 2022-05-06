@@ -310,6 +310,13 @@ class Decoder(nn.Module):
         elif 'optimization' in args.other_params:
             pred_goals_batch, pred_probs_batch = utils.select_goals_by_optimization(
                 np.array(labels).reshape([batch_size, self.future_frame_num, 2]), mapping)
+
+            for i in range(batch_size):
+                get_scores_inputs = (inputs, hidden_states, inputs_lengths, i, mapping, device)
+                scores, offsets = self.get_scores(pred_goals_batch[i], *get_scores_inputs, get_offsets = True)
+                print("offsets.shape:", offsets.shape)
+                pred_goals_batch[i] = pred_goals_batch[i] + offsets
+
         elif args.nms_threshold is not None:
             pred_goals_batch = [mapping[i]['pred_goals'] for i in range(batch_size)]
             pred_probs_batch = [mapping[i]['pred_probs'] for i in range(batch_size)]
