@@ -832,7 +832,7 @@ def visualize_goals_2D_new(mapping, goals_2D, scores: np.ndarray, future_frame_n
         if goals_2D is not None:
             goals_2D = np.array(goals_2D)
             #marker_size = 70
-            marker_size = 20
+            marker_size = 10
             plt.scatter(goals_2D[:, 0], goals_2D[:, 1], c=scores, cmap=cmap, norm=sm.norm, s=marker_size, alpha=0.5, marker=',')
         # s is size, default 20
 
@@ -1413,6 +1413,23 @@ def get_neighbour_points_dynamic(points, topk_ids=None, mapping=None, neighbour_
     points = list(grid.keys())
     return points
 
+
+
+def get_neighbour_points_dynamic_new(points, topk_ids=None, mapping=None, neighbour_dis=2):
+    # grid = np.zeros([300, 300], dtype=int)
+    grid = {}
+    #points_new = []
+    num = len(points)
+    for fake_idx, point in enumerate(points):
+        x, y = round(float(point[0])), round(float(point[1]))
+        granularity = 0.25 * np.power(2, np.floor(4 * fake_idx/num))
+        #print(granularity)
+        # not compatible argo
+        for i in np.arange(-neighbour_dis, (neighbour_dis + 1)， granularity):
+            for j in np.arange(-neighbour_dis, (neighbour_dis + 1)， granularity):
+                grid[(x + i * granularity, y+j * granularity)] = 1
+    points = list(grid.keys())
+    return points
 
 def get_neighbour_points_new(points, topk_ids=None, mapping=None, neighbour_dis=2, density=0.25):
     grid = {}
