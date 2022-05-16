@@ -1430,9 +1430,12 @@ def get_neighbour_points_dynamic_new(points, topk_ids=None, mapping=None, neighb
         granularity = 1 * np.power(2, np.floor(4 * fake_idx/num))
         #print(granularity)
         # not compatible argo
-        for i in np.arange(-neighbour_dis, (neighbour_dis), granularity):
-            for j in np.arange(-neighbour_dis, (neighbour_dis), granularity):
+        for i in np.arange(0, (neighbour_dis), granularity):
+            for j in np.arange(0, (neighbour_dis), granularity):
                 grid[(x + i * granularity, y+j * granularity)] = 1
+        #for i in np.arange(-neighbour_dis, (neighbour_dis), granularity):
+        #    for j in np.arange(-neighbour_dis, (neighbour_dis), granularity):
+        #        grid[(x + i * granularity, y+j * granularity)] = 1
     points = list(grid.keys())
     return points
 
