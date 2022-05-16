@@ -1427,7 +1427,7 @@ def get_neighbour_points_dynamic_new(points, topk_ids=None, mapping=None, neighb
     num = len(points)
     for fake_idx, point in enumerate(points):
         x, y = round(float(point[0])), round(float(point[1]))
-        granularity = 1 * np.power(2, np.floor(4 * fake_idx/num))
+        granularity = 0.5 * np.power(2, np.floor(4 * fake_idx/num))
         #print(granularity)
         # not compatible argo
         for i in np.arange(0, (neighbour_dis), granularity):
