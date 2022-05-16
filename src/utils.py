@@ -831,7 +831,8 @@ def visualize_goals_2D_new(mapping, goals_2D, scores: np.ndarray, future_frame_n
     if True:
         if goals_2D is not None:
             goals_2D = np.array(goals_2D)
-            marker_size = 70
+            #marker_size = 70
+            marker_size = 20
             plt.scatter(goals_2D[:, 0], goals_2D[:, 1], c=scores, cmap=cmap, norm=sm.norm, s=marker_size, alpha=0.5, marker=',')
         # s is size, default 20
 
