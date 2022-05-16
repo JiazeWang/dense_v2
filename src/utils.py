@@ -769,6 +769,7 @@ def visualize_goals_2D_new(mapping, goals_2D, scores: np.ndarray, future_frame_n
     cmap = plt.cm.get_cmap('Reds')
     vmin = np.log(0.0001)
     vmin = np.log(0.00001)
+    vmin = np.log(0.000001)
     scores = np.clip(scores.copy(), a_min=vmin, a_max=np.inf)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=np.max(scores)))
     plt.colorbar(sm)
