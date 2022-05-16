@@ -720,6 +720,157 @@ def visualize_goals_2D(mapping, goals_2D, scores: np.ndarray, future_frame_num, 
         input()
 
 
+def visualize_goals_2D_new(mapping, goals_2D, scores: np.ndarray, future_frame_num, loss=None, labels: np.ndarray = None,
+                       labels_is_valid=None, predict: np.ndarray = None):
+    print('in visualize_goals_2D', mapping['file_name'])
+    print('speed', mapping.get('seep', None))
+
+    assert predict is not None
+    predict = predict.reshape([6, future_frame_num, 2])
+    assert labels.shape == (future_frame_num, 2)
+
+    if 'eval_time' in mapping:
+        assert labels.shape[0] == labels_is_valid.shape[0] == future_frame_num
+        eval_time = mapping['eval_time']
+        labels = labels[:eval_time]
+        predict = predict[:, :eval_time, :]
+        labels_is_valid = labels_is_valid[:eval_time]
+        future_frame_num = eval_time
+
+    if labels_is_valid is not None:
+        assert labels.shape[0] == labels_is_valid.shape[0]
+        labels = [labels[i] for i in range(future_frame_num) if labels_is_valid[i]]
+        labels = np.array(labels)
+
+    if 'time_offset' in mapping:
+        time_offset = mapping['time_offset']
+    else:
+        time_offset = None
+
+    assert labels is not None
+    labels = labels.reshape([-1])
+
+    fig_scale = 1.0
+    marker_size_scale = 2
+    # target_agent_color, target_agent_edge_color = '#0d79e7', '#bcd6ed' # blue
+    target_agent_color, target_agent_edge_color = '#4bad34', '#c5dfb3'
+
+    def get_scaled_int(a):
+        return round(a * fig_scale)
+
+    plt.cla()
+    fig = plt.figure(0, figsize=(get_scaled_int(45), get_scaled_int(38)))
+
+    if True:
+        plt.xlim(-100, 100)
+        plt.ylim(-30, 100)
+
+    # plt.figure(0, dpi=300)
+    cmap = plt.cm.get_cmap('Reds')
+    vmin = np.log(0.0001)
+    vmin = np.log(0.00001)
+    scores = np.clip(scores.copy(), a_min=vmin, a_max=np.inf)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=np.max(scores)))
+    plt.colorbar(sm)
+
+    trajs = mapping['trajs']
+    if args.argoverse:
+        name = os.path.split(mapping['file_name'])[1].split('.')[0]
+    name = name + '.FDE={}'.format(loss)
+
+    add_end = True
+
+    linewidth = 5
+
+    for lane in mapping['vis_lanes']:
+        lane = lane[:, :2]
+        assert lane.shape == (len(lane), 2), lane.shape
+        plt.plot(lane[:, 0], lane[:, 1], linestyle="-", color="black", marker=None,
+                 markersize=0,
+                 alpha=0.5,
+                 linewidth=2,
+                 zorder=0)
+        # plt.fill(lane[:, 0], lane[:, 1], linestyle="-", color='#a5a5a5',
+        #          linewidth=2,
+        #          zorder=0)
+
+    yaw_0 = None
+
+    def draw_his_trajs():
+        for i, traj in enumerate(trajs):
+            assert isinstance(traj, np.ndarray)
+            assert traj.ndim == 2 and traj.shape[1] == 2, traj.shape
+            if i == 0:
+                traj = np.array(traj).reshape([-1])
+                t = np.zeros(len(traj) + 2)
+                t[:len((traj))] = traj
+                t[-2] = labels[0]
+                t[-1] = labels[1]
+
+                plt.plot(t[0::2], t[1::2], linestyle="-", color=target_agent_color, marker=None,
+                         alpha=1,
+                         linewidth=linewidth,
+                         zorder=0)
+                # if 'vis_video' in args.other_params:
+                # plt.plot(0.0, 0.0, marker=CustomMarker("icon", 0), c=target_agent_color,
+                #          markersize=20 * marker_size_scale, markeredgecolor=target_agent_edge_color, markeredgewidth=0.5)
+            else:
+                if True:
+                    pass
+                else:
+                    if len(traj) >= 2:
+                        color = "darkblue"
+                        plt.plot(traj[:, 0], traj[:, 1], linestyle="-", color=color, marker=None,
+                                 alpha=1,
+                                 linewidth=linewidth,
+                                 zorder=0)
+
+    draw_his_trajs()
+
+    if True:
+        if goals_2D is not None:
+            goals_2D = np.array(goals_2D)
+            marker_size = 70
+            plt.scatter(goals_2D[:, 0], goals_2D[:, 1], c=scores, cmap=cmap, norm=sm.norm, s=marker_size, alpha=0.5, marker=',')
+        # s is size, default 20
+
+        # if False:
+        for each in predict:
+            function2 = plt.plot(each[:, 0], each[:, 1], linestyle="-", color="darkorange", marker=None,
+                                 linewidth=linewidth,
+                                 zorder=0, label='Predicted trajectory')
+
+            if add_end:
+                plt.plot(each[-1, 0], each[-1, 1], markersize=15 * marker_size_scale, color="darkorange", marker="*",
+                         markeredgecolor='black')
+
+        if add_end:
+            plt.plot(labels[-2], labels[-1], markersize=15 * marker_size_scale, color=target_agent_color, marker="*",
+                     markeredgecolor='black')
+
+        function1 = plt.plot(labels[0::2], labels[1::2], linestyle="-", color=target_agent_color, linewidth=linewidth,
+                             zorder=0, label='Ground truth trajectory')
+
+    functions = function1 + function2
+    fun_labels = [f.get_label() for f in functions]
+    plt.legend(functions, fun_labels, loc=0)
+
+    plt.title('FDE={} file_name={}'.format(loss, mapping['file_name']))
+    ax = plt.gca()
+    ax.set_aspect(1)
+    ax.xaxis.set_major_locator(MultipleLocator(4))
+    ax.yaxis.set_major_locator(MultipleLocator(4))
+
+    os.makedirs(os.path.join(args.log_dir, 'visualize_' + time_begin), exist_ok=True)
+    plt.savefig(os.path.join(args.log_dir, 'visualize_' + time_begin,
+                             get_name("visualize" + ("" if name == "" else "_" + name) + ".png")), bbox_inches='tight')
+    plt.close()
+    global visualize_num
+    visualize_num += 1
+    if visualize_num > 200 and 'vis_video' not in args.other_params and 'vis_all' not in args.other_params:
+        print('press any key to continue')
+        input()
+
 def load_model(model, state_dict, prefix=''):
     missing_keys = []
     unexpected_keys = []

@@ -297,7 +297,7 @@ class Decoder(nn.Module):
             pass
         if args.visualize:
             for i in range(batch_size):
-                utils.visualize_goals_2D(mapping[i], mapping[i]['vis.goals_2D'], mapping[i]['vis.scores'], self.future_frame_num,
+                utils.visualize_goals_2D_new(mapping[i], mapping[i]['vis.goals_2D'], mapping[i]['vis.scores'], self.future_frame_num,
                                          labels=mapping[i]['vis.labels'],
                                          labels_is_valid=mapping[i]['vis.labels_is_valid'],
                                          predict=mapping[i]['vis.predict_trajs'])
@@ -384,7 +384,7 @@ class Decoder(nn.Module):
                 if args.visualize:
                     for i in range(batch_size):
                         predict = np.zeros((self.mode_num, self.future_frame_num, 2))
-                        utils.visualize_goals_2D(mapping[i], mapping[i]['vis.goals_2D'], mapping[i]['vis.scores'],
+                        utils.visualize_goals_2D_new(mapping[i], mapping[i]['vis.goals_2D'], mapping[i]['vis.scores'],
                                                  self.future_frame_num,
                                                  labels=mapping[i]['vis.labels'],
                                                  labels_is_valid=mapping[i]['vis.labels_is_valid'],
