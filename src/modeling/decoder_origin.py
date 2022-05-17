@@ -140,9 +140,9 @@ class Decoder(nn.Module):
             k = 40
         _, topk_ids = torch.topk(scores, k=min(k, len(scores)))
         topk_ids = topk_ids.tolist()
-        #goals_2D_new = utils.get_neighbour_points(goals_2D[topk_ids], topk_ids=topk_ids, mapping=mapping[i])
+        goals_2D_new = utils.get_neighbour_points(goals_2D[topk_ids], topk_ids=topk_ids, mapping=mapping[i])
         #goals_2D_new = utils.get_neighbour_points_dynamic(goals_2D[topk_ids], topk_ids=topk_ids, mapping=mapping[i])
-        goals_2D_new = utils.get_neighbour_points_dynamic_new(goals_2D[topk_ids], topk_ids=topk_ids, mapping=mapping[i])
+        #goals_2D_new = utils.get_neighbour_points_dynamic_new(goals_2D[topk_ids], topk_ids=topk_ids, mapping=mapping[i])
         #print("goals_2D_new[0]:", goals_2D_new[0])
         #print("len(goals_2D_new):", len(goals_2D_new))
         #assert len(goals_2D_new)
