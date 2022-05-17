@@ -172,9 +172,7 @@ class VectorNet(nn.Module):
         attention_mask = torch.zeros([batch_size, max_poly_num, max_poly_num], device=device)
         for i, length in enumerate(inputs_lengths):
             attention_mask[i][:length][:length].fill_(1)
-
         hidden_states = self.global_graph(inputs, attention_mask, mapping)
-
-        utils.logging('time3', round(time.time() - starttime, 2), 'secs')
-
+        #utils.logging('time3', round(time.time() - starttime, 2), 'secs')
+        utils.logging('', round(time.time() - starttime, 3), '')
         return self.decoder(mapping, batch_size, lane_states_batch, inputs, inputs_lengths, hidden_states, device)
